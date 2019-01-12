@@ -30,6 +30,6 @@ forked from [silly](https://github.com/findstr/silly), but so many changes have 
 ## Test
 
 - all the test code will be included into ./test folder
-- run ./silly test/test will auto test all module
+- run ./x test/test will auto test all module
 
 
