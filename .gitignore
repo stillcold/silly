@@ -35,6 +35,6 @@ luac
 *.i*86
 *.x86_64
 *.hex
-/silly
+/x
 # Debug files
 *.dSYM/
