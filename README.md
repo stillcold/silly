@@ -1,4 +1,5 @@
-# x(forked from https://github.com/findstr/silly, but so many changes have been made)
+# x
+forked from https://github.com/findstr/silly, but so many changes have been made
 
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/findstr/silly/blob/master/LICENSE)
 
