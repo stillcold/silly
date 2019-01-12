@@ -10,7 +10,7 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-#include "silly.h"
+#include "x.h"
 
 #define	ssl_malloc	silly_malloc
 #define	ssl_free	silly_free

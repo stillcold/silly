@@ -5,9 +5,9 @@
 #include <lua.h>
 #include <lauxlib.h>
 
-#include "silly.h"
-#include "silly_log.h"
-#include "silly_malloc.h"
+#include "x.h"
+#include "x_log.h"
+#include "x_malloc.h"
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 

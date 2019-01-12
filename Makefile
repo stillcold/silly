@@ -2,7 +2,7 @@
 
 #---------
 
-TARGET ?= silly
+TARGET ?= x
 
 #-----------platform
 
@@ -48,25 +48,25 @@ all:jemalloc
 #-----------project
 TEST_PATH = test
 LUACLIB_PATH ?= luaclib
-SRC_PATH = silly-src
+SRC_PATH = x-src
 LIB_PATH = lualib-src
 INCLUDE = -I $(LUA_INC) -I $(JEMALLOC_INC) -I $(SRC_PATH)
 SRC_FILE = \
       main.c \
-      silly_socket.c \
-      silly_queue.c \
-      silly_worker.c \
-      silly_timer.c \
-      silly_run.c \
-      silly_daemon.c \
-      silly_env.c \
-      silly_malloc.c \
-      silly_log.c \
+      x_socket.c \
+      x_queue.c \
+      x_worker.c \
+      x_timer.c \
+      x_run.c \
+      x_daemon.c \
+      x_env.c \
+      x_malloc.c \
+      x_log.c \
 
 SRC = $(addprefix $(SRC_PATH)/, $(SRC_FILE))
 OBJS = $(patsubst %.c,%.o,$(SRC))
 
-LIB_SRC = lualib-silly.c \
+LIB_SRC = lualib-x.c \
 	  lualib-profiler.c \
 	  lualib-netstream.c \
 	  lualib-netpacket.c \

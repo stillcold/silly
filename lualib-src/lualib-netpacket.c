@@ -6,9 +6,9 @@
 #include <lua.h>
 #include <lauxlib.h>
 
-#include "silly.h"
-#include "silly_log.h"
-#include "silly_malloc.h"
+#include "x.h"
+#include "x_log.h"
+#include "x_malloc.h"
 
 #define DEFAULT_QUEUE_SIZE 2048
 #define HASH_SIZE 2048
