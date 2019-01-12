@@ -1,4 +1,4 @@
-# silly
+# x(forked from https://github.com/findstr/silly, but so many changes have been made)
 
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/findstr/silly/blob/master/LICENSE)
 
@@ -15,7 +15,7 @@
 - make macosx
 
 ## Run
-    ./silly <configfile>
+    ./x <configfile>
 
 ## Config
 
@@ -31,8 +31,4 @@
 - all the test code will be included into ./test folder
 - run ./silly test/test will auto test all module
 
-## Wiki
-https://github.com/findstr/silly/wiki
 
-## Benchmark
-https://github.com/findstr/silly/wiki/Benchmark
