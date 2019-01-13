@@ -15,7 +15,7 @@ forked from [silly](https://github.com/findstr/silly), but so many changes have 
 - make linux
 - make macosx
 
-## install
+## Install
 - make install
 
 ## Run
