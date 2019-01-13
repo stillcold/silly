@@ -15,8 +15,11 @@ forked from [silly](https://github.com/findstr/silly), but so many changes have 
 - make linux
 - make macosx
 
+## install
+- make install
+
 ## Run
-    ./x <configfile>
+    x <configfile>
 
 ## Config
 
