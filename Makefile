@@ -3,6 +3,7 @@
 #---------
 
 TARGET ?= x
+FINALPROCNAME = x
 
 #-----------platform
 
@@ -46,6 +47,7 @@ MALLOC_STATICLIB=$(JEMALLOC_STATICLIB)
 all:jemalloc
 
 #-----------project
+BIN_DIR = /usr/local/bin
 TEST_PATH = test
 LUACLIB_PATH ?= luaclib
 SRC_PATH = x-src
@@ -113,3 +115,5 @@ ifneq (,$(wildcard $(JEMALLOC_DIR)/Makefile))
 	cd $(JEMALLOC_DIR)&&make clean&&rm Makefile
 endif
 
+install:
+	install -D $(FINALPROCNAME) $(BIN_DIR)/$(FINALPROCNAME)
