@@ -15,8 +15,11 @@ forked from [silly](https://github.com/findstr/silly), but so many changes have 
 - make linux
 - make macosx
 
+## Install
+- make install
+
 ## Run
-    ./x <configfile>
+    x <configfile>
 
 ## Config
 
@@ -30,6 +33,6 @@ forked from [silly](https://github.com/findstr/silly), but so many changes have 
 ## Test
 
 - all the test code will be included into ./test folder
-- run ./x test/test will auto test all module
+- run x test/test.conf will auto test all module
 
 
