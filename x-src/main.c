@@ -23,7 +23,7 @@ checktype(lua_State *L, const char *key, int skt, int type)
 		const char *expect = lua_typename(L, type);
 		const char *got = lua_typename(L, lua_type(L, skt));
 		const char *fmt = "[checktype] %s expecte %s but got %s\n";
-		silly_log(fmt, key, expect, got);
+		x_log(fmt, key, expect, got);
 		exit(-1);
 	}
 	return 0;
@@ -36,7 +36,7 @@ optint(const char *key, int v)
 	int len;
 	char *end;
 	const char *val;
-	val = silly_env_get(key);
+	val = x_env_get(key);
 	if (val == NULL)
 		return v;
 	len = strlen(val);
@@ -44,7 +44,7 @@ optint(const char *key, int v)
 	n = strtol(val, &end, 0);
 	if (errno != 0 || end != (val + len)) {
 		const char *fmt = "[config] incorrect value of '%s' %s\n";
-		silly_log(fmt, key);
+		x_log(fmt, key);
 		exit(-1);
 	}
 	return n;
@@ -54,7 +54,7 @@ static inline const char *
 optstr(const char *key, size_t *sz, const char *v)
 {
 	const char *str;
-	str = silly_env_get(key);
+	str = x_env_get(key);
 	if (str == NULL)
 		str = v;
 	*sz = strlen(str);
@@ -72,7 +72,7 @@ enveach(lua_State *L, char *first, char *curr, char *end)
 		k = lua_tolstring(L, -2, &sz);
 		assert(curr <= end);
 		if (sz >= (size_t)(end - curr)) {
-			silly_log("[enveach] buff is too short\n");
+			x_log("[enveach] buff is too short\n");
 			exit(-1);
 		}
 		memcpy(curr, k, sz);
@@ -84,14 +84,14 @@ enveach(lua_State *L, char *first, char *curr, char *end)
 			if (type != LUA_TSTRING && type != LUA_TNUMBER) {
 				const char *fmt = "[enveach]"
 					"%s expect string/number bug got:%s\n";
-				silly_log(fmt, lua_typename(L, type));
+				x_log(fmt, lua_typename(L, type));
 			}
 			const char *value = lua_tostring(L, -1);
 			curr[sz] = '\0';
 			char *eval = getenv(first);
 			if (eval)
 				value = eval;
-			silly_env_set(first, value);
+			x_env_set(first, value);
 		}
 		lua_pop(L, 1);
 	}
@@ -143,7 +143,7 @@ initenv(const char *self, const char *file)
 	if (err != LUA_OK) {
 		const char *err = lua_tostring(L, -1);
 		err = skipcode(err);
-		silly_log("%s parse config file:%s fail,%s\n",
+		x_log("%s parse config file:%s fail,%s\n",
 			self, file, err);
 		lua_close(L);
 		exit(-1);
@@ -154,7 +154,7 @@ initenv(const char *self, const char *file)
 }
 
 static void
-parseconfig(struct silly_config *config)
+parseconfig(struct x_config *config)
 {
 	int slash;
 	char *p;
@@ -164,25 +164,25 @@ parseconfig(struct silly_config *config)
 	//bootstrap
 	str = optstr("bootstrap", &sz, "");
 	if (sz >= ARRAY_SIZE(config->bootstrap)) {
-		silly_log("[config] bootstrap is too long\n");
+		x_log("[config] bootstrap is too long\n");
 		exit(-1);
 	}
 	if (sz == 0) {
-		silly_log("[config] bootstrap can't be empty\n");
+		x_log("[config] bootstrap can't be empty\n");
 		exit(-1);
 	}
 	memcpy(config->bootstrap, str, sz + 1);
 	//lualib_path
 	str = optstr("lualib_path", &sz, "");
 	if (sz >= ARRAY_SIZE(config->lualib_path)) {
-		silly_log("[config] lualib_path is too long\n");
+		x_log("[config] lualib_path is too long\n");
 		exit(-1);
 	}
 	memcpy(config->lualib_path, str, sz + 1);
 	//lualib_cpath
 	str = optstr("lualib_cpath", &sz, "");
 	if (sz >= ARRAY_SIZE(config->lualib_cpath)) {
-		silly_log("[config] lualib_cpath is too long\n");
+		x_log("[config] lualib_cpath is too long\n");
 		exit(-1);
 	}
 	memcpy(config->lualib_cpath, str, sz + 1);
@@ -196,13 +196,13 @@ parseconfig(struct silly_config *config)
 	else
 		sz = snprintf(p, n, "%s", str);
 	if (sz >= n) {
-		silly_log("[config] logpath is too long\n");
+		x_log("[config] logpath is too long\n");
 		exit(-1);
 	}
 	//pidfile
 	str = optstr("pidfile", &sz, "");
 	if ((sz + 1) >= ARRAY_SIZE(config->pidfile)) {
-		silly_log("[config] pidfile is too long\n");
+		x_log("[config] pidfile is too long\n");
 		exit(-1);
 	}
 	memcpy(config->pidfile, str, sz + 1);
@@ -227,18 +227,18 @@ selfname(const char *path)
 
 int main(int argc, char *argv[])
 {
-	struct silly_config config;
+	struct x_config config;
 	if (argc != 2) {
 		printf("USAGE:%s <config file>\n", argv[0]);
 		return -1;
 	}
-	silly_env_init();
+	x_env_init();
 	config.selfname = selfname(argv[0]);
 	initenv(config.selfname, argv[1]);
 	parseconfig(&config);
-	silly_run(&config);
-	silly_env_exit();
-	silly_log("%s exit, leak memory size:%zu\n",
-		argv[0], silly_memused());
+	x_run(&config);
+	x_env_exit();
+	x_log("%s exit, leak memory size:%zu\n",
+		argv[0], x_memused());
 	return 0;
 }

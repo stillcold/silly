@@ -45,7 +45,7 @@ xalloc_usable_size(void *ptr)
 }
 
 void *
-silly_malloc(size_t sz)
+x_malloc(size_t sz)
 {
 	void *ptr = MALLOC(sz);
 	int real = xalloc_usable_size(ptr);
@@ -54,7 +54,7 @@ silly_malloc(size_t sz)
 }
 
 void *
-silly_realloc(void *ptr, size_t sz)
+x_realloc(void *ptr, size_t sz)
 {
 	size_t realo = xalloc_usable_size(ptr);
 	atomic_sub(&allocsize, realo);
@@ -65,7 +65,7 @@ silly_realloc(void *ptr, size_t sz)
 }
 
 void
-silly_free(void *ptr)
+x_free(void *ptr)
 {
 	size_t real = xalloc_usable_size(ptr);
 	atomic_sub(&allocsize, real);
@@ -76,7 +76,7 @@ silly_free(void *ptr)
 	(name "-" STR(MAJOR) "." STR(MINOR))
 
 const char *
-silly_allocator()
+x_allocator()
 {
 #if defined(USE_JEMALLOC)
 	return BUILD("jemalloc", JEMALLOC_VERSION_MAJOR, JEMALLOC_VERSION_MINOR);
@@ -86,14 +86,14 @@ silly_allocator()
 }
 
 size_t
-silly_memused()
+x_memused()
 {
 	return allocsize;
 }
 
 //Resident Set Size
 size_t
-silly_memrss()
+x_memrss()
 {
 #if defined(__linux__)
 	size_t rss;

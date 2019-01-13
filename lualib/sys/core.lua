@@ -1,4 +1,4 @@
-local silly = require "sys.silly"
+local x = require "sys.x"
 
 local core = {}
 local error = error
@@ -19,42 +19,42 @@ local corunning = coroutine.running
 local coyield = coroutine.yield
 local coresume = coroutine.resume
 --misc
-local core_log = silly.log
+local core_log = x.log
 core.log = core_log
-core.exit = silly.exit
-core.tostring = silly.tostring
-core.genid = silly.genid
+core.exit = x.exit
+core.tostring = x.tostring
+core.genid = x.genid
 --env
-core.envget = silly.getenv
-core.envset = silly.setenv
+core.envget = x.getenv
+core.envset = x.setenv
 --socket
-local socket_listen = silly.listen
-local socket_bind = silly.bind
-local socket_connect = silly.connect
-local socket_udp = silly.udp
-local socket_close = silly.close
-core.packmulti = silly.packmulti
-core.freemulti = silly.freemulti
-core.multicast = silly.multicast
-core.write = silly.send
-core.udpwrite = silly.udpsend
-core.ntop = silly.ntop
+local socket_listen = x.listen
+local socket_bind = x.bind
+local socket_connect = x.connect
+local socket_udp = x.udp
+local socket_close = x.close
+core.packmulti = x.packmulti
+core.freemulti = x.freemulti
+core.multicast = x.multicast
+core.write = x.send
+core.udpwrite = x.udpsend
+core.ntop = x.ntop
 --timer
-local silly_timeout = silly.timeout
-core.now = silly.timenow
-core.monotonic = silly.timemonotonic
-core.monotonicsec = silly.timemonotonicsec
+local x_timeout = x.timeout
+core.now = x.timenow
+core.monotonic = x.timemonotonic
+core.monotonicsec = x.timemonotonicsec
 --debug interface
-core.memused = silly.memused
-core.memrss = silly.memrss
-core.msgsize = silly.msgsize
-core.cpuinfo = silly.cpuinfo
-core.getpid = silly.getpid
+core.memused = x.memused
+core.memrss = x.memrss
+core.msgsize = x.msgsize
+core.cpuinfo = x.cpuinfo
+core.getpid = x.getpid
 --const
-core.allocator = silly.memallocator()
-core.version = silly.version()
-core.pollapi = silly.pollapi()
-core.timerrs = silly.timerresolution()
+core.allocator = x.memallocator()
+core.version = x.version()
+core.pollapi = x.pollapi()
+core.timerrs = x.timerresolution()
 
 local function errmsg(msg)
 	return traceback("error: " .. tostring(msg), 2)
@@ -200,7 +200,7 @@ end
 
 function core.sleep(ms)
 	local co = corunning()
-	local session = silly_timeout(ms)
+	local session = x_timeout(ms)
 	sleep_session_co[session] = co
 	sleep_co_session[co] = session
 	waitresume(co, coyield("SLEEP"))
@@ -208,7 +208,7 @@ end
 
 function core.timeout(ms, func)
 	local co = cocreate(func)
-	local session = silly_timeout(ms)
+	local session = x_timeout(ms)
 	sleep_session_co[session] = co
 	sleep_co_session[co] = session
 	return session
@@ -313,12 +313,12 @@ end
 
 --the message handler can't be yield
 local messagetype = {
-	[1] = "expire",		--SILLY_TEXPIRE		= 1
-	[2] = "accept",		--SILLY_SACCEPT		= 2
-	[3] = "close",		--SILLY_SCLOSE		= 3
-	[4] = "connected",	--SILLY_SCONNECTED	= 4
-	[5] = "data",		--SILLY_SDATA		= 5
-	[6] = "udp",		--SILLY_UDP		= 6
+	[1] = "expire",		--X_TEXPIRE		= 1
+	[2] = "accept",		--X_SACCEPT		= 2
+	[3] = "close",		--X_SCLOSE		= 3
+	[4] = "connected",	--X_SCONNECTED	= 4
+	[5] = "data",		--X_SDATA		= 5
+	[6] = "udp",		--X_UDP		= 6
 }
 
 local MSG = {}
@@ -385,7 +385,7 @@ local function dispatch(type, fd, message, ...)
 	dispatch_wakeup()
 end
 
-silly.dispatch(dispatch)
+x.dispatch(dispatch)
 
 return core
 

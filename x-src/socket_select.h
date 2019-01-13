@@ -38,7 +38,7 @@ static inline sp_t
 sp_create(int nr)
 {
 	int i;
-	sp_t sp = silly_malloc(sizeof(struct sp_poll));
+	sp_t sp = x_malloc(sizeof(struct sp_poll));
 	for (i = 0; i < SP_MAX; i++) {
 		sp->event[i].fd = -1;
 		sp->event[i].rwstatus = 0;
@@ -50,7 +50,7 @@ sp_create(int nr)
 static inline void
 sp_free(sp_t fd)
 {
-	silly_free(fd);
+	x_free(fd);
 }
 
 static inline int

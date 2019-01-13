@@ -3,9 +3,9 @@
 
 #define LOG_MAX_LEN	(1024)
 
-void silly_log_start();
-void silly_log_raw(const char *fmt, ...);
-void silly_log(const char *fmt, ...);
+void x_log_start();
+void x_log_raw(const char *fmt, ...);
+void x_log(const char *fmt, ...);
 
 #endif
 

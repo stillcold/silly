@@ -123,7 +123,7 @@ push_complete(lua_State *L, struct netpacket *p, struct incomplete *ic)
 	assert(p->head < p->cap);
 	assert(p->tail < p->cap);
 	if (p->head == p->tail) {
-		silly_log("packet queue full\n");
+		x_log("packet queue full\n");
 		expand_queue(L, p);
 	}
 
@@ -145,7 +145,7 @@ push_once(lua_State *L, int fd, int size, const uint8_t *buff)
 		} else {		//have no enough psize info
 			assert(ic->rsize == -1);
 			ic->psize |= *buff;
-			ic->buff = (uint8_t *)silly_malloc(ic->psize);
+			ic->buff = (uint8_t *)x_malloc(ic->psize);
 
 			++buff;
 			--size;
@@ -159,7 +159,7 @@ push_once(lua_State *L, int fd, int size, const uint8_t *buff)
 			eat += 1;		//for the length header
 		}
 	} else {	//new incomplete
-		ic = silly_malloc(sizeof(*ic));
+		ic = x_malloc(sizeof(*ic));
 		ic->fd = fd;
 		ic->buff = NULL;
 		ic->psize = 0;
@@ -168,7 +168,7 @@ push_once(lua_State *L, int fd, int size, const uint8_t *buff)
 		if (size >= 2) {
 			ic->psize = (*buff << 8) | *(buff + 1);
 			ic->rsize = min(ic->psize, size - 2);
-			ic->buff = silly_malloc(ic->psize);
+			ic->buff = x_malloc(ic->psize);
 			eat = ic->rsize + 2;
 			memcpy(ic->buff, buff + 2, ic->rsize);
 		} else {
@@ -181,7 +181,7 @@ push_once(lua_State *L, int fd, int size, const uint8_t *buff)
 
 	if (ic->rsize == ic->psize) {
 		push_complete(L, p, ic);
-		silly_free(ic);
+		x_free(ic);
 	} else {
 		assert(ic->rsize < ic->psize);
 		put_incomplete(p, ic);
@@ -214,8 +214,8 @@ clear_incomplete(lua_State *L, int sid)
 	struct incomplete *ic = get_incomplete(p, sid);
 	if (ic == NULL)
 		return ;
-	silly_free(ic->buff);
-	silly_free(ic);
+	x_free(ic->buff);
+	x_free(ic);
 	return ;
 }
 
@@ -265,7 +265,7 @@ lpack(lua_State *L)
 	str = getbuffer(L, 1, &size);
 	assert(size < (unsigned short)-1);
 
-	p = silly_malloc(size + 2);
+	p = x_malloc(size + 2);
 	*((unsigned short *)p) = htons(size);
 	memcpy(p + 2, str, size);
 
@@ -293,7 +293,7 @@ ltostring(lua_State *L)
 	buff = lua_touserdata(L, 1);
 	size = luaL_checkinteger(L, 2);
 	lua_pushlstring(L, buff, size);
-	silly_free(buff);
+	x_free(buff);
 	return 1;
 }
 
@@ -304,7 +304,7 @@ ldrop(lua_State *L)
 	if (type != LUA_TLIGHTUSERDATA)
 		return luaL_error(L, "netpacket.drop can only drop lightuserdata");
 	void *p = lua_touserdata(L, 1);
-	silly_free(p);
+	x_free(p);
 	return 0;
 }
 
@@ -315,20 +315,20 @@ ldrop(lua_State *L)
 static int
 lmessage(lua_State *L)
 {
-	struct silly_message_socket *sm= tosocket(lua_touserdata(L, 2));
+	struct x_message_socket *sm= tosocket(lua_touserdata(L, 2));
 	lua_settop(L, 1);
 	switch (sm->type) {
-	case SILLY_SDATA:
+	case X_SDATA:
 		push(L, sm->sid, sm->data, sm->ud);
 		return 1;
-	case SILLY_SCLOSE:
+	case X_SCLOSE:
 		clear_incomplete(L, sm->sid);
 		return 1;
-	case SILLY_SACCEPT:
-	case SILLY_SCONNECTED:
+	case X_SACCEPT:
+	case X_SCONNECTED:
 		return 1;
 	default:
-		silly_log("lmessage unspport:%d\n", sm->type);
+		x_log("lmessage unspport:%d\n", sm->type);
 		assert(!"never come here");
 		return 1;
 	}
@@ -344,8 +344,8 @@ packet_gc(lua_State *L)
 		while (ic) {
 			struct incomplete *t = ic;
 			ic = ic->next;
-			silly_free(t->buff);
-			silly_free(t);
+			x_free(t->buff);
+			x_free(t);
 		}
 	}
 	return 0;

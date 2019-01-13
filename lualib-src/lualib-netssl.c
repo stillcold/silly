@@ -12,8 +12,8 @@
 
 #include "x.h"
 
-#define	ssl_malloc	silly_malloc
-#define	ssl_free	silly_free
+#define	ssl_malloc	x_malloc
+#define	ssl_free	x_free
 
 static BIO_METHOD *ssl_method = NULL;
 
@@ -167,9 +167,9 @@ gc(lua_State *L)
 		struct item *i = queuepop(sb);
 		if (i == NULL)
 			break;
-		silly_free(i->buff);
+		x_free(i->buff);
 	}
-	silly_free(sb->prebuff);
+	x_free(sb->prebuff);
 	SSL_free(sb->ssl);
 	sb->ssl = NULL;
 	return 0;
@@ -179,10 +179,10 @@ static int
 sslwrite(BIO *h, const char *buff, int num)
 {
 	struct socketbuff *sb;
-	uint8_t *dat = (uint8_t *)silly_malloc(num);
+	uint8_t *dat = (uint8_t *)x_malloc(num);
 	memcpy(dat, buff, num);
  	sb = (struct socketbuff *)BIO_get_data(h);
-	silly_socket_send(sb->fd, dat, num, NULL);
+	x_socket_send(sb->fd, dat, num, NULL);
 	return num;
 }
 
@@ -214,7 +214,7 @@ sslread(BIO *h, char *buff, int size)
 		memcpy(buff, i->buff + offset, once);
 		if (once == (int)i->size) {
 			offset = 0;
-			silly_free(i->buff);
+			x_free(i->buff);
 			queuedrop(sb);
 		} else {
 			offset += once;
@@ -244,7 +244,7 @@ sslfree(BIO *a)
 		return 0;
 	if (BIO_get_shutdown(a)) {
 		if (BIO_get_init(a)) {
-			//silly_socket_close(a->num);
+			//x_socket_close(a->num);
 			//we'll do it at lua level
 		}
 		BIO_set_init(a, 0);
@@ -318,14 +318,14 @@ static int
 lmessage(lua_State *L)
 {
 	struct socketbuff *sb;
-	struct silly_message_socket *msg;
+	struct x_message_socket *msg;
 	sb = luaL_checkudata(L, 1, "socketbuff");
 	msg = tosocket(lua_touserdata(L, 2));
 	lua_pop(L, 1);
 	switch (msg->type) {
-	case SILLY_SDATA:
+	case X_SDATA:
 		queuepush(L, sb, msg->data, msg->ud);
-		//prevent silly_work free the msg->data
+		//prevent x_work free the msg->data
 		msg->data = NULL;
 		break;
 	default:
@@ -340,7 +340,7 @@ checkprebuff(struct socketbuff *sb, size_t need)
 {
 	while ((need + sb->presize) > sb->precap) {
 		sb->precap = 2 * (sb->precap + 1);
-		sb->prebuff = silly_realloc(sb->prebuff, sb->precap);
+		sb->prebuff = x_realloc(sb->prebuff, sb->precap);
 	}
 	return ;
 }

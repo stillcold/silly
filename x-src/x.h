@@ -6,25 +6,25 @@
 #include "x_malloc.h"
 #include "x_socket.h"
 
-#define SILLY_VERSION_MAJOR 0
-#define SILLY_VERSION_MINOR 3
-#define SILLY_VERSION_RELEASE 0
-#define SILLY_VERSION_NUM ((SILLY_VERSION_MAJOR * 100) + SILLY_VERSION_MINOR)
-#define SILLY_VERSION STR(SILLY_VERSION_MAJOR) "." STR(SILLY_VERSION_MINOR)
-#define SILLY_RELEASE SILLY_VERSION "." STR(SILLY_VERSION_RELEASE)
+#define X_VERSION_MAJOR 0
+#define X_VERSION_MINOR 3
+#define X_VERSION_RELEASE 0
+#define X_VERSION_NUM ((X_VERSION_MAJOR * 100) + X_VERSION_MINOR)
+#define X_VERSION STR(X_VERSION_MAJOR) "." STR(X_VERSION_MINOR)
+#define X_RELEASE X_VERSION "." STR(X_VERSION_RELEASE)
 
 
-#define tocommon(msg)   ((struct silly_message *)(msg))
-#define totexpire(msg)  ((struct silly_message_texpire *)(msg))
-#define tosocket(msg)   ((struct silly_message_socket *)(msg))
-#define COMMONFIELD struct silly_message *next; enum silly_message_type type;
+#define tocommon(msg)   ((struct x_message *)(msg))
+#define totexpire(msg)  ((struct x_message_texpire *)(msg))
+#define tosocket(msg)   ((struct x_message_socket *)(msg))
+#define COMMONFIELD struct x_message *next; enum x_message_type type;
 
-struct silly_listen {
+struct x_listen {
 	char name[64];
 	char addr[64];
 };
 
-struct silly_config {
+struct x_config {
 	int daemon;
 	int socketaffinity;
 	int workeraffinity;
@@ -39,25 +39,25 @@ struct silly_config {
 };
 
 
-enum silly_message_type {
-	SILLY_TEXPIRE		= 1,
-	SILLY_SACCEPT		= 2,	//new connetiong
-	SILLY_SCLOSE,			//close from client
-	SILLY_SCONNECTED,		//async connect result
-	SILLY_SDATA,			//data packet(raw) from client
-	SILLY_SUDP,			//data packet(raw) from client(udp)
+enum x_message_type {
+	X_TEXPIRE		= 1,
+	X_SACCEPT		= 2,	//new connetiong
+	X_SCLOSE,			//close from client
+	X_SCONNECTED,		//async connect result
+	X_SDATA,			//data packet(raw) from client
+	X_SUDP,			//data packet(raw) from client(udp)
 };
 
-struct silly_message {
+struct x_message {
 	COMMONFIELD
 };
 
-struct silly_message_texpire {	//timer expire
+struct x_message_texpire {	//timer expire
 	COMMONFIELD
 	uint32_t session;
 };
 
-struct silly_message_socket {	//socket accept
+struct x_message_socket {	//socket accept
 	COMMONFIELD
 	int sid;
 	//SACCEPT, it used as portid,
@@ -68,12 +68,12 @@ struct silly_message_socket {	//socket accept
 };
 
 static inline void
-silly_message_free(struct silly_message *msg)
+x_message_free(struct x_message *msg)
 {
 	int type = msg->type;
-	if (type == SILLY_SDATA || type == SILLY_SUDP)
-		silly_free(tosocket(msg)->data);
-	silly_free(msg);
+	if (type == X_SDATA || type == X_SUDP)
+		x_free(tosocket(msg)->data);
+	x_free(msg);
 }
 
 #endif

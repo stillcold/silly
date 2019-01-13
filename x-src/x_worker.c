@@ -15,58 +15,58 @@
 #define max(a, b)	((a) > (b) ? (a) : (b))
 
 
-struct silly_worker {
+struct x_worker {
 	lua_State *L;
 	uint32_t id;
 	size_t maxmsg;
-	struct silly_queue *queue;
-	void (*callback)(lua_State *L, struct silly_message *msg);
+	struct x_queue *queue;
+	void (*callback)(lua_State *L, struct x_message *msg);
 };
 
-struct silly_worker *W;
+struct x_worker *W;
 
 
 void
-silly_worker_push(struct silly_message *msg)
+x_worker_push(struct x_message *msg)
 {
 	size_t sz;
-	sz = silly_queue_push(W->queue, msg);
+	sz = x_queue_push(W->queue, msg);
 	if (unlikely(sz > W->maxmsg)) {
 		W->maxmsg *= 2;
-		silly_log("may overload, now message size is:%zu\n", sz);
+		x_log("may overload, now message size is:%zu\n", sz);
 	}
 }
 
 void
-silly_worker_dispatch()
+x_worker_dispatch()
 {
-	struct silly_message *msg;
-	struct silly_message *tmp;
-	msg = silly_queue_pop(W->queue);
+	struct x_message *msg;
+	struct x_message *tmp;
+	msg = x_queue_pop(W->queue);
 	while (msg) {
 		assert(W->callback);
 		W->callback(W->L, msg);
 		tmp = msg;
 		msg = msg->next;
-		silly_message_free(tmp);
+		x_message_free(tmp);
 	}
 	return ;
 }
 
 uint32_t
-silly_worker_genid()
+x_worker_genid()
 {
 	return W->id++;
 }
 
 size_t
-silly_worker_msgsize()
+x_worker_msgsize()
 {
-	return silly_queue_size(W->queue);
+	return x_queue_size(W->queue);
 }
 
 void
-silly_worker_callback(void (*callback)(struct lua_State *L, struct silly_message *msg))
+x_worker_callback(void (*callback)(struct lua_State *L, struct x_message *msg))
 {
 	assert(callback);
 	W->callback = callback;
@@ -113,22 +113,22 @@ lua_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
 	(void) ud;
 	(void) osize;
 	if (nsize == 0) {
-		silly_free(ptr);
+		x_free(ptr);
 		return NULL;
 	} else {
-		return silly_realloc(ptr, nsize);
+		return x_realloc(ptr, nsize);
 	}
 }
 
 void
-silly_worker_start(const struct silly_config *config)
+x_worker_start(const struct x_config *config)
 {
 	int err;
 	lua_State *L = lua_newstate(lua_alloc, NULL);
 	luaL_openlibs(L);
 	err = setlibpath(L, config->lualib_path, config->lualib_cpath);
 	if (unlikely(err != 0)) {
-		silly_log("silly worker set lua libpath fail,%s\n",
+		x_log("x worker set lua libpath fail,%s\n",
 			lua_tostring(L, -1));
 		lua_close(L);
 		exit(-1);
@@ -136,7 +136,7 @@ silly_worker_start(const struct silly_config *config)
 	lua_gc(L, LUA_GCRESTART, 0);
 	err = luaL_loadfile(L, config->bootstrap);
 	if (unlikely(err) || unlikely(lua_pcall(L, 0, 0, 0))) {
-		silly_log("silly worker call %s fail,%s\n",
+		x_log("x worker call %s fail,%s\n",
 			config->bootstrap, lua_tostring(L, -1));
 		lua_close(L);
 		exit(-1);
@@ -146,20 +146,20 @@ silly_worker_start(const struct silly_config *config)
 }
 
 void
-silly_worker_init()
+x_worker_init()
 {
-	W = (struct silly_worker *)silly_malloc(sizeof(*W));
+	W = (struct x_worker *)x_malloc(sizeof(*W));
 	memset(W, 0, sizeof(*W));
 	W->maxmsg = 128;
-	W->queue = silly_queue_create();
+	W->queue = x_queue_create();
 	return ;
 }
 
 void
-silly_worker_exit()
+x_worker_exit()
 {
 	lua_close(W->L);
-	silly_queue_free(W->queue);
-	silly_free(W);
+	x_queue_free(W->queue);
+	x_free(W);
 }
 

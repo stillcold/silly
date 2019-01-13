@@ -22,7 +22,7 @@
 struct {
 	int running;
 	int workerstatus; /* 0:sleep 1:running -1:dead */
-	const struct silly_config *conf;
+	const struct x_config *conf;
 	pthread_mutex_t mutex;
 	pthread_cond_t cond;
 } R;
@@ -33,14 +33,14 @@ thread_timer(void *arg)
 {
 	(void)arg;
 	for (;;) {
-		silly_timer_update();
+		x_timer_update();
 		if (R.workerstatus == -1)
 			break;
 		usleep(TIMER_ACCURACY);
 		if (R.workerstatus == 0)
 			pthread_cond_signal(&R.cond);
 	}
-	silly_socket_terminate();
+	x_socket_terminate();
 	return NULL;
 }
 
@@ -50,7 +50,7 @@ thread_socket(void *arg)
 {
 	(void)arg;
 	for (;;) {
-		int err = silly_socket_poll();
+		int err = x_socket_poll();
 		if (err < 0)
 			break;
 		if (R.workerstatus == 0)
@@ -62,12 +62,12 @@ thread_socket(void *arg)
 static void *
 thread_worker(void *arg)
 {
-	const struct silly_config *c;
-	c = (struct silly_config *)arg;
-	silly_worker_start(c);
+	const struct x_config *c;
+	c = (struct x_config *)arg;
+	x_worker_start(c);
 	pthread_mutex_lock(&R.mutex);
 	while (R.running) {
-		silly_worker_dispatch();
+		x_worker_dispatch();
 		//allow spurious wakeup, it's harmless
 		R.workerstatus = 0;
 		pthread_cond_wait(&R.cond, &R.mutex);
@@ -84,7 +84,7 @@ thread_create(pthread_t *tid, void *(*start)(void *), void *arg, int cpuid)
 	int err;
 	err = pthread_create(tid, NULL, start, arg);
 	if (unlikely(err < 0)) {
-		silly_log("thread create fail:%d\n", err);
+		x_log("thread create fail:%d\n", err);
 		exit(-1);
 	}
 #ifdef USE_CPU_AFFINITY
@@ -111,7 +111,7 @@ static void
 signal_usr1(int sig)
 {
 	(void)sig;
-	silly_daemon_sigusr1(R.conf);
+	x_daemon_sigusr1(R.conf);
 }
 
 static int
@@ -125,7 +125,7 @@ signal_init()
 }
 
 void
-silly_run(const struct silly_config *config)
+x_run(const struct x_config *config)
 {
 	int i;
 	int err;
@@ -134,38 +134,38 @@ silly_run(const struct silly_config *config)
 	R.conf = config;
 	pthread_mutex_init(&R.mutex, NULL);
 	pthread_cond_init(&R.cond, NULL);
-	silly_daemon_start(config);
-	silly_log_start();
+	x_daemon_start(config);
+	x_log_start();
 	signal_init();
-	silly_timer_init();
-	err = silly_socket_init();
+	x_timer_init();
+	err = x_socket_init();
 	if (unlikely(err < 0)) {
-		silly_log("%s socket init fail:%d\n", config->selfname, err);
-		silly_daemon_stop(config);
+		x_log("%s socket init fail:%d\n", config->selfname, err);
+		x_daemon_stop(config);
 		exit(-1);
 	}
-	silly_worker_init();
+	x_worker_init();
 	srand(time(NULL));
 	thread_create(&pid[0], thread_socket, NULL, config->socketaffinity);
 	thread_create(&pid[1], thread_timer, NULL, config->timeraffinity);
 	thread_create(&pid[2], thread_worker, (void *)config, config->workeraffinity);
-	silly_log("%s %s is running ...\n", config->selfname, SILLY_RELEASE);
-	silly_log("cpu affinity setting, timer:%d, socket:%d, worker:%d\n",
+	x_log("%s %s is running ...\n", config->selfname, X_RELEASE);
+	x_log("cpu affinity setting, timer:%d, socket:%d, worker:%d\n",
 		config->timeraffinity, config->socketaffinity, config->workeraffinity);
 	for (i = 0; i < 3; i++)
 		pthread_join(pid[i], NULL);
-	silly_daemon_stop(config);
+	x_daemon_stop(config);
 	pthread_mutex_destroy(&R.mutex);
 	pthread_cond_destroy(&R.cond);
-	silly_worker_exit();
-	silly_timer_exit();
-	silly_socket_exit();
-	silly_log("%s has already exit...\n", config->selfname);
+	x_worker_exit();
+	x_timer_exit();
+	x_socket_exit();
+	x_log("%s has already exit...\n", config->selfname);
 	return ;
 }
 
 void
-silly_exit()
+x_exit()
 {
 	R.running = 0;
 }

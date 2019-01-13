@@ -6,30 +6,30 @@
 
 #include "x_queue.h"
 
-struct silly_queue {
+struct x_queue {
 	size_t size;
-	struct silly_message **tail;
-	struct silly_message *head;
+	struct x_message **tail;
+	struct x_message *head;
 	spinlock_t lock;
 };
 
 static inline void
-lock(struct silly_queue *q)
+lock(struct x_queue *q)
 {
 	spinlock_lock(&q->lock);
 }
 
 static inline void
-unlock(struct silly_queue *q)
+unlock(struct x_queue *q)
 {
 	spinlock_unlock(&q->lock);
 	return ;
 }
 
-struct silly_queue *
-silly_queue_create()
+struct x_queue *
+x_queue_create()
 {
-	struct silly_queue *q = (struct silly_queue *)silly_malloc(sizeof(*q));
+	struct x_queue *q = (struct x_queue *)x_malloc(sizeof(*q));
 	q->size = 0;
 	q->head = NULL;
 	q->tail = &q->head;
@@ -38,24 +38,24 @@ silly_queue_create()
 }
 
 void
-silly_queue_free(struct silly_queue *q)
+x_queue_free(struct x_queue *q)
 {
-	struct silly_message *next, *tmp;
+	struct x_message *next, *tmp;
 	lock(q);
 	next = q->head;
 	while (next) {
 		tmp = next;
 		next = next->next;
-		silly_message_free(tmp);
+		x_message_free(tmp);
 	}
 	unlock(q);
 	spinlock_destroy(&q->lock);
-	silly_free(q);
+	x_free(q);
 	return ;
 }
 
 int
-silly_queue_push(struct silly_queue *q, struct silly_message *msg)
+x_queue_push(struct x_queue *q, struct x_message *msg)
 {
 	msg->next = NULL;
 	lock(q);
@@ -66,10 +66,10 @@ silly_queue_push(struct silly_queue *q, struct silly_message *msg)
 }
 
 
-struct silly_message *
-silly_queue_pop(struct silly_queue *q)
+struct x_message *
+x_queue_pop(struct x_queue *q)
 {
-	struct silly_message *msg;
+	struct x_message *msg;
 	if (q->head == NULL)
 		return NULL;
 	lock(q);
@@ -87,7 +87,7 @@ silly_queue_pop(struct silly_queue *q)
 }
 
 size_t
-silly_queue_size(struct silly_queue *q)
+x_queue_size(struct x_queue *q)
 {
 	return q->size;
 }

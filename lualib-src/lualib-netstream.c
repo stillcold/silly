@@ -44,7 +44,7 @@ free_pool(lua_State *L)
 	end = n + sz;
 	while (n < end) {
 		if (n->buff) {
-			silly_free(n->buff);
+			x_free(n->buff);
 			n->buff = NULL;
 		}
 		++n;
@@ -125,7 +125,7 @@ remove_node(lua_State *L, struct node_buffer *nb, struct node *n)
 	nb->offset = 0;
 	if (nb->head == NULL)
 		nb->tail = &nb->head;
-	silly_free(n->buff);
+	x_free(n->buff);
 	n->buff = NULL;
 	lua_rawgeti(L, POOL, 1);
 	struct node *free = lua_touserdata(L, -1);
@@ -175,7 +175,7 @@ lnew(lua_State *L)
 
 
 //@input
-//	node, silly_message_socket
+//	node, x_message_socket
 //@return
 //	node buffer
 
@@ -205,7 +205,7 @@ pushstring(lua_State *L, struct node_buffer *nb, int sz)
 		if (n->size == 0)
 			remove_node(L, nb, n);
 	} else {
-		char *buff = (char *)silly_malloc(sz);
+		char *buff = (char *)x_malloc(sz);
 		char *p = buff;
 		while (sz) {
 			int tmp;
@@ -222,7 +222,7 @@ pushstring(lua_State *L, struct node_buffer *nb, int sz)
 		}
 		assert(sz == 0);
 		lua_pushlstring(L, buff, p - buff);
-		silly_free(buff);
+		x_free(buff);
 	}
 	lua_replace(L, 1);
 	lua_settop(L, 1);
@@ -361,20 +361,20 @@ static int
 lpush(lua_State *L)
 {
 	char *str;
-	struct silly_message_socket *msg = tosocket(lua_touserdata(L, NB + 1));
+	struct x_message_socket *msg = tosocket(lua_touserdata(L, NB + 1));
 	switch (msg->type) {
-	case SILLY_SDATA:
+	case X_SDATA:
 		str = (char *)msg->data;
-		//prevent silly_work free the msg->data
+		//prevent x_work free the msg->data
 		//it will be exist until it be read out
 		msg->data = NULL;
 		push(L, msg->sid, str, msg->ud);
 		break;
-	case SILLY_SACCEPT:
-	case SILLY_SCLOSE:
-	case SILLY_SCONNECTED:
+	case X_SACCEPT:
+	case X_SCLOSE:
+	case X_SCONNECTED:
 	default:
-		silly_log("lmessage unspport:%d\n", msg->type);
+		x_log("lmessage unspport:%d\n", msg->type);
 		assert(!"never come here");
 		break;
 	}
@@ -386,10 +386,10 @@ ltodata(lua_State *L)
 {
 	uint8_t *data;
 	size_t datasz;
-	struct silly_message *sm = (struct silly_message *)lua_touserdata(L, 1);
+	struct x_message *sm = (struct x_message *)lua_touserdata(L, 1);
 	switch (sm->type) {
-	case SILLY_SUDP:
-	case SILLY_SDATA:
+	case X_SUDP:
+	case X_SDATA:
 		data = tosocket(sm)->data;
 		datasz = tosocket(sm)->ud;
 		break;
@@ -407,7 +407,7 @@ tpush(lua_State *L)
 	size_t sz;
 	int fd = luaL_checkinteger(L, 2);
 	const char *src = luaL_checklstring(L, 3, &sz);
-	void *dat = silly_malloc(sz);
+	void *dat = x_malloc(sz);
 	memcpy(dat, src, sz);
 	push(L, fd, dat, sz);
 	return 0;

@@ -9,14 +9,14 @@
 static pid_t pid;
 
 void
-silly_log_start()
+x_log_start()
 {
 	pid = getpid();
 	return ;
 }
 
 void
-silly_log_raw(const char *fmt, ...)
+x_log_raw(const char *fmt, ...)
 {
 	va_list ap;
 	char buffer[LOG_MAX_LEN];
@@ -28,7 +28,7 @@ silly_log_raw(const char *fmt, ...)
 }
 
 void
-silly_log(const char *fmt, ...)
+x_log(const char *fmt, ...)
 {
 	int nr;
 	va_list ap;

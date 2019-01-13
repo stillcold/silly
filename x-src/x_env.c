@@ -5,13 +5,13 @@
 
 #include "x_env.h"
 
-struct silly_env {
+struct x_env {
 	lua_State *L;
 };
 
-static struct silly_env *E;
+static struct x_env *E;
 
-const char *silly_env_get(const char *key)
+const char *x_env_get(const char *key)
 {
 	const char *value;
 	lua_State *L = E->L;
@@ -21,7 +21,7 @@ const char *silly_env_get(const char *key)
 	return value;
 }
 
-void silly_env_set(const char *key, const char *value)
+void x_env_set(const char *key, const char *value)
 {
 	lua_State *L = E->L;
 	lua_pushstring(L, value);
@@ -31,18 +31,18 @@ void silly_env_set(const char *key, const char *value)
 
 
 int
-silly_env_init()
+x_env_init()
 {
-	E = (struct silly_env *)silly_malloc(sizeof(*E));
+	E = (struct x_env *)x_malloc(sizeof(*E));
 	E->L = luaL_newstate();
 	return 0;
 }
 
 void
-silly_env_exit()
+x_env_exit()
 {
 	lua_close(E->L);
-	silly_free(E);
+	x_free(E);
 	return ;
 }
 

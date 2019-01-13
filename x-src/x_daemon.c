@@ -14,7 +14,7 @@ static int pidfile;
 extern int daemon(int, int);
 
 static void
-pidfile_create(const struct silly_config *conf)
+pidfile_create(const struct x_config *conf)
 {
 	int err;
 	const char *path = conf->pidfile;
@@ -23,7 +23,7 @@ pidfile_create(const struct silly_config *conf)
 		return ;
 	pidfile = open(path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
 	if (pidfile == -1) {
-		silly_log("[pidfile] create '%s' fail:%s\n", path,
+		x_log("[pidfile] create '%s' fail:%s\n", path,
 				strerror(errno));
 		exit(-1);
 	}
@@ -32,7 +32,7 @@ pidfile_create(const struct silly_config *conf)
 		char pid[128];
 		FILE *fp = fdopen(pidfile, "r+");
 		fscanf(fp , "%s\n", pid);
-		silly_log("[pidfile] lock '%s' fail,"
+		x_log("[pidfile] lock '%s' fail,"
 			"another instace of '%s' alread run\n",
 			path, pid);
 		fclose(fp);
@@ -55,7 +55,7 @@ pidfile_write()
 }
 
 static inline void
-pidfile_delete(const struct silly_config *conf)
+pidfile_delete(const struct x_config *conf)
 {
 	if (pidfile == -1)
 		return ;
@@ -65,7 +65,7 @@ pidfile_delete(const struct silly_config *conf)
 }
 
 static inline void
-logfileopen(const struct silly_config *conf)
+logfileopen(const struct x_config *conf)
 {
 	int fd;
 	fd = open(conf->logpath, O_CREAT | O_WRONLY | O_APPEND, 00666);
@@ -79,7 +79,7 @@ logfileopen(const struct silly_config *conf)
 }
 
 void
-silly_daemon_start(const struct silly_config *conf)
+x_daemon_start(const struct x_config *conf)
 {
 	int err;
 	if (!conf->daemon)
@@ -88,7 +88,7 @@ silly_daemon_start(const struct silly_config *conf)
 	err = daemon(1, 0);
 	if (err < 0) {
 		pidfile_delete(conf);
-		silly_log("[daemon] %s\n", strerror(errno));
+		x_log("[daemon] %s\n", strerror(errno));
 		exit(0);
 	}
 	pidfile_write();
@@ -97,14 +97,14 @@ silly_daemon_start(const struct silly_config *conf)
 }
 
 void
-silly_daemon_sigusr1(const struct silly_config *conf)
+x_daemon_sigusr1(const struct x_config *conf)
 {
 	logfileopen(conf);
 	return ;
 }
 
 void
-silly_daemon_stop(const struct silly_config *conf)
+x_daemon_stop(const struct x_config *conf)
 {
 	if (!conf->daemon)
 		return ;
