@@ -7,8 +7,10 @@ local DO = require "rpcl"
 
 local server = rpc.createserver {
 	addr = core.envget "rpcd_port",
+	-- addr = "127.0.0.1:9002",
 	proto = proto,
 	accept = function(fd, addr)
+		print("accept", addr)
 		core.log("accept", fd, addr)
 	end,
 	close = function(fd, errno)
@@ -21,6 +23,9 @@ local server = rpc.createserver {
 
 local ok = server:listen()
 core.log("rpc server start:", ok)
+
+addr = core.envget "rpcd_port",
+print("addr", addr)
 
 console {
 	addr = ":2323"

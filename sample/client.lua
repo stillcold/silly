@@ -8,6 +8,7 @@ local encode = wire.encode
 
 local client = msg.createclient {
 	addr = core.envget "sampled_port",
+	-- addr = core.envget "127.0.0.1:9002",
 	accept = function(fd, addr)
 		core.log("accept", addr)
 	end,

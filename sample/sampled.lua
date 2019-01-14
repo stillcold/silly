@@ -16,6 +16,7 @@ local decode = wire.decode
 
 local function send(fd, cmd, ack)
 	local dat = encode(sampleproto, cmd, ack)
+	print(dat, cmd, ack)
 	return server:send(fd, dat)
 end
 
@@ -62,7 +63,7 @@ server = msg.createserver {
 core.start(function()
 	local ok = rpcclient:connect()
 	core.log("rpc connect", ok)
-	assert(ok)
+	--assert(ok)
 	ok = server:start()
 	core.log("server start", ok)
 	assert(ok)
