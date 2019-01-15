@@ -55,7 +55,12 @@ server = msg.createserver {
 		core.log("close", fd, errno)
 	end,
 	data = function(fd, d, sz)
+		print("recieve", fd, d, sz)
 		local cmd, data = decode(sampleproto, d, sz)
+		print("cmd  is", cmd)
+		for k,v in pairs(data) do
+			print(k,v)
+		end
 		assert(MSG[cmd])(fd, cmd, data)
 	end
 }
@@ -63,7 +68,7 @@ server = msg.createserver {
 core.start(function()
 	local ok = rpcclient:connect()
 	core.log("rpc connect", ok)
-	--assert(ok)
+	assert(ok)
 	ok = server:start()
 	core.log("server start", ok)
 	assert(ok)
