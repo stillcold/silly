@@ -24,7 +24,7 @@ local server = rpc.createserver {
 local ok = server:listen()
 core.log("rpc server start:", ok)
 
-addr = core.envget "rpcd_port",
+addr = core.envget ("rpcd_port")
 print("addr", addr)
 
 console {

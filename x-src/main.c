@@ -91,6 +91,7 @@ enveach(lua_State *L, char *first, char *curr, char *end)
 			char *eval = getenv(first);
 			if (eval)
 				value = eval;
+			// the key sentence.
 			x_env_set(first, value);
 		}
 		lua_pop(L, 1);
@@ -130,21 +131,21 @@ skipcode(const char *str)
 }
 
 static void
-initenv(const char *self, const char *file)
+initenv(const char *selfName, const char *configfilePath)
 {
 	int err;
 	char name[256] = {0};
 	lua_State *L = luaL_newstate();
 	luaL_openlibs(L);
 	err = luaL_loadstring(L, load_config);
-	lua_pushstring(L, file);
+	lua_pushstring(L, configfilePath);
 	assert(err == LUA_OK);
 	err = lua_pcall(L, 1, 1, 0);
 	if (err != LUA_OK) {
 		const char *err = lua_tostring(L, -1);
 		err = skipcode(err);
 		x_log("%s parse config file:%s fail,%s\n",
-			self, file, err);
+			selfName, configfilePath, err);
 		lua_close(L);
 		exit(-1);
 	}
@@ -232,7 +233,9 @@ int main(int argc, char *argv[])
 		printf("USAGE:%s <config file>\n", argv[0]);
 		return -1;
 	}
+	// create a lua state
 	x_env_init();
+	// set selfname from input arg, in fact this can put in to config
 	config.selfname = selfname(argv[0]);
 	initenv(config.selfname, argv[1]);
 	parseconfig(&config);
