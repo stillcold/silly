@@ -25,7 +25,7 @@ struct {
 	const struct x_config *conf;
 	pthread_mutex_t mutex;
 	pthread_cond_t cond;
-} R;
+} R;// R means run.
 
 
 static void *
@@ -137,13 +137,16 @@ x_run(const struct x_config *config)
 	x_daemon_start(config);
 	x_log_start();
 	signal_init();
+	// init memory, clocktime, ticktime, expire, monotonic and lock for T
 	x_timer_init();
+	// in x_socket.c, set SSOCKET mainly
 	err = x_socket_init();
 	if (unlikely(err < 0)) {
 		x_log("%s socket init fail:%d\n", config->selfname, err);
 		x_daemon_stop(config);
 		exit(-1);
 	}
+	// init memory, maxmsg and message queue for W
 	x_worker_init();
 	srand(time(NULL));
 	thread_create(&pid[0], thread_socket, NULL, config->socketaffinity);
