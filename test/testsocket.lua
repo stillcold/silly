@@ -22,6 +22,7 @@ end
 return function()
 	local listenfd = socket.listen(":8990", function(fd, addr)
 		while true do
+			-- A voice tells me, this is the key sentence.
 			local n = socket.readline(fd)
 			assert(n)
 			recv_nr = recv_nr + #n

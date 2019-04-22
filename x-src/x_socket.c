@@ -69,6 +69,8 @@ union sockaddr_full {
 	struct sockaddr_in6 v6;
 };
 
+// Why its name is wlist, what does "w" stand for?
+// As far as I can tell, this structure may be a Loop List
 struct wlist {
 	struct wlist *next;
 	size_t size;
@@ -197,11 +199,16 @@ wlist_empty(struct socket *s)
 	return s->wlhead == NULL ? 1 : 0;
 }
 
+// Find one valid socket from socket pool.
+// Multithread teck used here, if socket thread is the only thread who can
+// access "ss", then some extra work can be done here to make the code clean.
 static struct socket*
 allocsocket(struct x_socket *ss, int fd, enum stype type, int protocol)
 {
 	int i;
 	int id;
+	// What the hell is PROTOCOL_PIPE? I thought the whole internet world is
+	// made of TCP and UDP.
 	assert(
 		protocol == PROTOCOL_TCP ||
 		protocol == PROTOCOL_UDP ||
@@ -209,9 +216,12 @@ allocsocket(struct x_socket *ss, int fd, enum stype type, int protocol)
 	for (i = 0; i < MAX_SOCKET_COUNT; i++) {
 		id = atomic_add_return(&ss->reserveid, 1);
 		if (unlikely(id < 0)) {
+			// use "&" is a cool choice, I like it.
 			id = id & 0x7fffffff;
 			atomic_and_return(&ss->reserveid, 0x7fffffff);
 		}
+		// Notice there is a hash operation. Is this safe? maybe two ids share
+		// the same hash?
 		struct socket *s = &ss->socketpool[HASH(id)];
 		if (s->type == STYPE_RESERVE) {
 			if (atomic_swap(&s->type, STYPE_RESERVE, type)) {
@@ -404,6 +414,7 @@ report_close(struct x_socket *ss, struct socket *s, int err)
 	return ;
 }
 
+// Hi, worker!
 static void
 report_data(struct x_socket *ss, struct socket *s, int type, uint8_t *data, size_t sz)
 {
@@ -555,8 +566,8 @@ sendudp(int fd, uint8_t *data, size_t sz, const union sockaddr_full *addr)
 	return 0;
 }
 
-
-
+// Tcp message recieved.
+// This method is very important.
 static int
 forward_msg_tcp(struct x_socket *ss, struct socket *s)
 {
@@ -566,6 +577,7 @@ forward_msg_tcp(struct x_socket *ss, struct socket *s)
 	sz = readn(s->fd, buf, presize);
 	//half close socket need no data
 	if (sz > 0 && s->type != STYPE_HALFCLOSE) {
+		// Notice message to top level.
 		report_data(ss, s, X_SDATA, buf, sz);
 		//to predict the pakcet size
 		if (sz == presize) {
@@ -1415,6 +1427,7 @@ x_socket_poll()
 		if (SP_READ(e)) {
 			switch (s->protocol) {
 			case PROTOCOL_TCP:
+				// This is where message recieved.
 				err = forward_msg_tcp(ss, s);
 				break;
 			case PROTOCOL_UDP:
