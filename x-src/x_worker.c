@@ -25,7 +25,7 @@ struct x_worker {
 
 struct x_worker *W;
 
-
+// Sockect thread will call this method and keep push data to message queue. 
 void
 x_worker_push(struct x_message *msg)
 {
@@ -37,6 +37,7 @@ x_worker_push(struct x_message *msg)
 	}
 }
 
+// Worker thread will handle all message pushed by socket thread.
 void
 x_worker_dispatch()
 {
@@ -45,6 +46,7 @@ x_worker_dispatch()
 	msg = x_queue_pop(W->queue);
 	while (msg) {
 		assert(W->callback);
+		// Here is the logic entrance.
 		W->callback(W->L, msg);
 		tmp = msg;
 		msg = msg->next;

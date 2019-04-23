@@ -604,6 +604,7 @@ luaopen_sys_x(lua_State *L)
 
 	lua_pushlightuserdata(L, (void *)m);
 	lua_gettable(L, LUA_REGISTRYINDEX);
+	// Here is the onlyl place where callback registered.
 	x_worker_callback(dispatch);
 	luaL_newlibtable(L, tbl);
 	luaL_setfuncs(L, tbl, 0);
