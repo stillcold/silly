@@ -1,19 +1,29 @@
+require "global"
+
 local server = require "http.server"
+local searchMgr = require "SearchMgr"
 local write = server.write
 local dispatch = {}
 
-dispatch["/"] = function(fd, reqeust, body)
-	local body = [[
+local defaultHead = [[
 		<html>
-			<head>Simple http server</head>
+			<head><center>Chao's Coding Assist</center></head>
 			<body>
-				<form action="upload" method="POST">
+			<center>
+				<form action="search" method="POST">
 				<input type="text" name="Hello"/>
-				<input type="submit" name="submit"/>
+				<input type="submit" name="submit" value="Search" />
 				</form>
+			</center>
 			</body>
+	]]
+local defaultTail = [[
 		</html>
 	]]
+local default = defaultHead..defaultTail
+
+dispatch["/"] = function(fd, reqeust, body)
+	local body = default
 	local head = {
 		"Content-Type: text/html",
 		}
@@ -38,7 +48,18 @@ dispatch["/upload"] = function(fd, request, body)
 	write(fd, 200, head, body)
 end
 
+dispatch["/search"] = function(fd, request, body)
+	if request.form.Hello then
+		content = request.form.Hello
+	end
+	local body = defaultHead..searchMgr:GetAnswer(content)..defaultTail
+	local head = {
+		"Content-Type: text/html",
+		}
+	write(fd, 200, head, body)
+end
 
+-- Entry!
 server.listen(":8089", function(fd, request, body)
 	local c = dispatch[request.uri]
 	if c then

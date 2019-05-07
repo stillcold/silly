@@ -38,3 +38,6 @@ luac
 /x
 # Debug files
 *.dSYM/
+
+#Pribate files
+/one/KeywordTbl.lua
