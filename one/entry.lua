@@ -2,9 +2,12 @@ require "global"
 local CodeMgr = require "CodeMgr"
 local core = require "sys.core"
 
-core.start(function()
+local function downloadCode()
 	CodeMgr:DownLoadCode()
-	-- core.exit()
+end
+
+core.start(function()
+	downloadCode()
 end)
 
 
