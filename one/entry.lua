@@ -1,4 +1,14 @@
 require "global"
+local CodeMgr = require "CodeMgr"
+local core = require "sys.core"
+
+core.start(function()
+	CodeMgr:DownLoadCode()
+	-- core.exit()
+end)
+
+
+print("code ok")
 
 local server = require "http.server"
 local searchMgr = require "SearchMgr"
