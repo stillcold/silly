@@ -7,7 +7,10 @@ local dispatch = {}
 
 local defaultHead = [[
 		<html>
-			<head><center>Chao's Coding Assist</center></head>
+			<head>
+			<title>Chao's Coding Assist</title>
+			<center>Chao's Coding Assist</center>
+			</head>
 			<body>
 			<center>
 				<form action="search" method="POST">
