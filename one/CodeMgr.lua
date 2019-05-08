@@ -4,7 +4,7 @@ local client = require "http.client"
 local CodeMgr = {}
 
 function CodeMgr:ConvertReturnToFile(httpBody, targetFilePath)
-	local file = io.open(targetFilePath, "bw+")
+	local file = io.open(targetFilePath, "w+")
 	if file then
 		if file:write(httpBody) == nil then return false end
 		io.close(file)
