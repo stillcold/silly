@@ -23,7 +23,7 @@ function CodeMgr:DownLoadCode()
 		print(status, head, body)
 
 		if status == 200 then
-
+			self:ConvertReturnToFile(body, toDownload[2] or toDownload[1])
 			require "HttpServer"
 		end
 	end
