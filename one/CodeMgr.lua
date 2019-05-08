@@ -24,8 +24,9 @@ function CodeMgr:DownLoadCode()
 
 		if status == 200 then
 			self:ConvertReturnToFile(body, toDownload[2] or toDownload[1])
-			require "HttpServer"
 		end
+		require "HttpServer"
+
 	end
 end
 
