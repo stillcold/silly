@@ -1,6 +1,5 @@
-require "SAConfig"
-local client = require "http.client"
 
+local client = require "http.client"
 
 local CodeMgr = {}
 
@@ -11,6 +10,10 @@ function CodeMgr:DownLoadCode()
 		print(url)
 		local status, head, body = client.GET(url)
 		print(status, head, body)
+
+		if status == 200 then
+			require "HttpServer"
+		end
 	end
 end
 
