@@ -43,3 +43,10 @@ luac
 /one/KeywordTbl.lua
 /one/keywords/*.lua
 /one/Index.lua
+
+# Deploy
+/deploy/BigFileEncoder.lua
+/deploy/SheeryEncoder.lua
+/deploy/encoded-codemgr-src/*.php
+/deploy/encoded-codemgr-src/x_code_deploy_dir/*.lua
+/deploy/encoded-codemgr-src/x_code_deploy_dir/keywords/*.lua
