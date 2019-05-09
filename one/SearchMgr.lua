@@ -15,7 +15,7 @@ for _, fileBaseName in pairs (toLoadKeywords) do
 end
 
 function searchMgr:GetAnswer(content)
-	print("search text is: "..content)
+	print("search text is: "..content.." lenth is "..#content)
 	local ret = {}
 	local matchCount = 0
 	for keyword,richTxt in pairs(keywordTbl) do
