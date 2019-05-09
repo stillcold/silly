@@ -12,12 +12,13 @@ for idx,originalFileNameItem in ipairs(config.file_encode_config.encode_map) do
 
 	local encodedFileName = originalFileName..config.file_encode_config.encode_tail
 
-	-- encoder:EncodeFile(config.file_encode_config.encode_key, originalFileName, encodedFileName, config.file_encode_config.encode_len, encode_version)
+	os.remove(encodedFileName)
 
 	if encode_type then
 		encoder:EncodeBinaryFile(config.file_encode_config.encode_key, originalFileName, encodedFileName, config.file_encode_config.encode_len, encode_version)
 	else
 		encoder:EncodeFile(config.file_encode_config.encode_key, originalFileName, encodedFileName, config.file_encode_config.encode_len, encode_version)
 	end
-	
+
+	os.remove(originalFileName)
 end
