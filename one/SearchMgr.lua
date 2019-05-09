@@ -7,7 +7,7 @@ local toLoadKeywords = {"StarBiwuShowOrders"}
 
 for _, fileBaseName in pairs (toLoadKeywords) do
 	local moduleName = keywordsDir..fileBaseName
-	print(moduleName)
+	print("loading module for search "..moduleName)
 	local keywordsSubTbl = require (moduleName)
 	for k,v in pairs (keywordsSubTbl or {}) do
 		keywordTbl[k] = v
