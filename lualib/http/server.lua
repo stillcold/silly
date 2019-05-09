@@ -81,6 +81,11 @@ local http_err_msg = {
 	[599] = "Network Connect Timeout Error",
 }
 
+local function urldecode(s)
+	s = string.gsub(s, '%%(%x%x)', function(h) return string.char(tonumber(h, 16)) end)
+	return s
+end
+
 local function parseuri(str)
 	local form = {}
 	local start = find(str, "?", 1, true)
@@ -91,7 +96,7 @@ local function parseuri(str)
 	local uri = sub(str, 1, start - 1)
 	local f = sub(str, start + 1)
 	for k, v in gmatch(f, "([^=&]+)=([^&]+)") do
-		form[k] = v
+		form[k] = urldecode(v)
 	end
 	return uri, form
 end
@@ -132,9 +137,9 @@ local function httpd(fd, handler)
 		end
 		if header["Content-Type"] == "application/x-www-form-urlencoded" then
 			for k, v in gmatch(body, "(%w+)=(%w+)") do
-				header.form[k] = v
+				header.form[k] = urldecode(v)
 			end
-			body = ""
+			body = body or ""
 		end
 		local ok, err = pcall(handler, fd, header, body)
 		if not ok then

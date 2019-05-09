@@ -4,6 +4,7 @@ SAConfig = {
 		Port = "80",
 		DownloadPreUrl = "DownloadCode.php?fileName=",
 		Alias = {
+			{"Index", "one/Index.lua"},
 			{"KeywordTbl", "one/KeywordTbl.lua"},
 			{"keywords/StarBiwuShowOrders", "one/keywords/StarBiwuShowOrders.lua"},
 		},

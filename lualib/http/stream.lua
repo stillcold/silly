@@ -37,7 +37,7 @@ function stream.readrequest(fd, readl, readn)
 			readl(fd, "\r\n")
 		end
 	end
-	local len = header["Content-Length"]
+	local len = header["Content-Length"] or header["content-length"]
 	if len then
 		local len = tonumber(len)
 		body = readn(fd, len)

@@ -2,27 +2,12 @@
 local server = require "http.server"
 local searchMgr = require "SearchMgr"
 local write = server.write
+local httpIndex = require "Index"
 
 local dispatch = {}
 
-local defaultHead = [[
-		<html>
-			<head>
-			<title>Chao's Coding Assist</title>
-			<center>Chao's Coding Assist</center>
-			</head>
-			<body>
-			<center>
-				<form action="search" method="POST">
-				<input type="text" name="Hello"/>
-				<input type="submit" name="submit" value="Search" />
-				</form>
-			</center>
-			</body>
-	]]
-local defaultTail = [[
-		</html>
-	]]
+local defaultHead = httpIndex.Head
+local defaultTail = httpIndex.Tail
 local default = defaultHead..defaultTail
 
 dispatch["/"] = function(fd, reqeust, body)
@@ -55,7 +40,11 @@ dispatch["/search"] = function(fd, request, body)
 	if request.form.Hello then
 		content = request.form.Hello
 	end
-	local body = defaultHead..searchMgr:GetAnswer(content)..defaultTail
+	for k,v in pairs(request.form) do
+		print (k,v)
+	end
+	print ("body is"..body)
+	local body = httpIndex.SearchResultHead..searchMgr:GetAnswer(content)..httpIndex.SearchResultTail
 	local head = {
 		"Content-Type: text/html",
 		}
@@ -64,6 +53,10 @@ end
 
 -- Entry!
 server.listen(":8089", function(fd, request, body)
+	print("body debug", body)
+	for k,v in pairs(request) do
+		print(k,v)
+	end
 	local c = dispatch[request.uri]
 	if c then
 		c(fd, request, body)
