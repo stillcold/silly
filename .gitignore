@@ -41,3 +41,4 @@ luac
 
 #Pribate files
 /one/KeywordTbl.lua
+/one/keywords/*.lua
