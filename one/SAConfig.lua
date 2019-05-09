@@ -5,6 +5,7 @@ SAConfig = {
 		DownloadPreUrl = "DownloadCode.php?fileName=",
 		Alias = {
 			{"KeywordTbl", "one/KeywordTbl.lua"},
+			{"keywords/StarBiwuShowOrders", "one/keywords/StarBiwuShowOrders.lua"},
 		},
 	},
 	

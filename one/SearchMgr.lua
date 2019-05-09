@@ -2,6 +2,17 @@ local searchMgr = {}
 
 local keywordTbl = require "KeywordTbl"
 
+local keywordsDir = "keywords/"
+local toLoadKeywords = {"StarBiwuShowOrders"}
+
+for _, fileBaseName in pairs (toLoadKeywords) do
+	local moduleName = keywordsDir..fileBaseName
+	print(moduleName)
+	local keywordsSubTbl = require moduleName
+	for k,v in pairs ({}) do
+		keywordTbl[k] = v
+	end
+end
 
 function searchMgr:GetAnswer(content)
 	print("search text is: "..content)

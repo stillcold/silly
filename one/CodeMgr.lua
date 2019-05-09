@@ -18,6 +18,7 @@ function CodeMgr:DownLoadCode()
 	local CodeConfig = SAConfig.CodeConfig
 	for _, toDownload in pairs(CodeConfig.Alias) do
 		local url = "http://"..CodeConfig.Host..":"..CodeConfig.Port.."/"..CodeConfig.DownloadPreUrl..toDownload[1]
+		print(url)
 		local status, head, body = client.GET(url)
 
 		if status == 200 then
@@ -26,9 +27,10 @@ function CodeMgr:DownLoadCode()
 		end
 
 		print("Code all set, start all modules now...")
-		require "HttpServer"
-
+		
 	end
+	require "HttpServer"
+
 end
 
 
