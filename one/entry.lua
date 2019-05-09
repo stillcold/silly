@@ -16,4 +16,3 @@ core.start(function()
 end)
 
 
-print("code ok")
