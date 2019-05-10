@@ -51,6 +51,21 @@ dispatch["/search"] = function(fd, request, body)
 	write(fd, 200, head, body)
 end
 
+dispatch["/detail"] = function(fd, request, body)
+	if request.form.Hello then
+		content = request.form.Hello
+	end
+	for k,v in pairs(request.form) do
+		print (k,v)
+	end
+	print ("body is"..body)
+	local body = httpIndex.SearchResultHead..searchMgr:GetDetail(content)..httpIndex.SearchResultTail
+	local head = {
+		"Content-Type: text/html",
+		}
+	write(fd, 200, head, body)
+end
+
 -- Entry!
 server.listen(":8089", function(fd, request, body)
 	print("body debug", body)
