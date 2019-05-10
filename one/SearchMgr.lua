@@ -41,7 +41,7 @@ function searchMgr:GetDetail(content)
 	for keyword,richTxt in pairs(keywordTbl) do
 		if keyword == content then
 			matchCount = matchCount + 1
-			table.insert(ret, self:GetDetailTips(matchCount))
+			-- table.insert(ret, self:GetDetailTips(matchCount))
 
 			local showTxt = self:ConvertToReadbleCode(keyword, richTxt)
 			table.insert(ret,  showTxt)
