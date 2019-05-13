@@ -56,7 +56,7 @@ end
 
 function searchMgr:GetSummary(resultCount)
 	if resultCount > 0 then
-		return global.httpBoldTagBegin..global.summaryOkText..resultCount..global.httpBoldTagEnd
+		return global.httpMultiLineTag..global.httpBoldTagBegin..global.summaryOkText..resultCount..global.httpBoldTagEnd
 	end
 
 	return global.summaryFailText
