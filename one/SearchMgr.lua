@@ -30,7 +30,8 @@ function searchMgr:GetAnswer(content)
 	table.insert(ret, self:GetSummary(matchCount))
 	print("search hit count is "..matchCount)
 
-	local res = table.concat( ret, global.httpMultiLineTag)
+	-- local res = table.concat( ret, global.httpLineEndTag)
+	local res = table.concat( ret, "")
 	return res
 end
 
@@ -67,8 +68,8 @@ function searchMgr:GetDetailTips(count)
 end
 
 function searchMgr:ConvertToReadbleText(keyword, richTxt)
-	local firstWordIdx = string.find(richTxt, "%w")
-	richTxt = string.sub(richTxt, firstWordIdx)
+	local firstWordIdx = string.find(richTxt, "[%\n%S]")
+	richTxt = string.sub(richTxt, firstWordIdx or 1)
 	richTxt = string.gsub(richTxt, "\n", "<br>")
 	richTxt = httpIndex.SearchItemContentBegin..richTxt..httpIndex.SearchItemContentEnd
 	-- return global.httpBoldTagBegin..keyword..global.httpBoldTagEnd..global.httpLineEndTag..richTxt   

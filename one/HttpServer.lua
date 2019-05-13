@@ -40,10 +40,6 @@ dispatch["/search"] = function(fd, request, body)
 	if request.form.Hello then
 		content = request.form.Hello
 	end
-	for k,v in pairs(request.form) do
-		print (k,v)
-	end
-	print ("body is"..body)
 	local body = httpIndex.SearchResultHead..searchMgr:GetAnswer(content)..httpIndex.SearchResultTail
 	local head = {
 		"Content-Type: text/html",
@@ -55,10 +51,6 @@ dispatch["/detail"] = function(fd, request, body)
 	if request.form.Hello then
 		content = request.form.Hello
 	end
-	for k,v in pairs(request.form) do
-		print (k,v)
-	end
-	print ("body is"..body)
 	local body = httpIndex.SearchResultHead..searchMgr:GetDetail(content)..httpIndex.SearchResultTail
 	local head = {
 		"Content-Type: text/html",
@@ -68,10 +60,6 @@ end
 
 -- Entry!
 server.listen(":8089", function(fd, request, body)
-	print("body debug", body)
-	for k,v in pairs(request) do
-		print(k,v)
-	end
 	local c = dispatch[request.uri]
 	if c then
 		c(fd, request, body)
