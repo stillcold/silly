@@ -4,7 +4,17 @@ local searchMgr = {}
 local keywordTbl = require "KeywordTbl"
 
 local keywordsDir = "keywords/"
-local toLoadKeywords = {"StarBiwuShowOrders","J1900","L10"}
+local allAlias = SAConfig.CodeConfig.Alias
+
+local toLoadKeywords = {}
+
+for idx,aliasTbl in pairs(allAlias) do
+	if string.find(aliasTbl[1], "keyword") then
+		local baseFileName = string.match(aliasTbl[2], "(%w+).lua")
+		print(baseFileName)
+		table.insert(toLoadKeywords, baseFileName)
+	end
+end 
 
 for _, fileBaseName in pairs (toLoadKeywords) do
 	local moduleName = keywordsDir..fileBaseName
