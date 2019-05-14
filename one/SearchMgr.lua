@@ -4,7 +4,7 @@ local searchMgr = {}
 local keywordTbl = require "KeywordTbl"
 
 local keywordsDir = "keywords/"
-local toLoadKeywords = {"StarBiwuShowOrders"}
+local toLoadKeywords = {"StarBiwuShowOrders","J1900"}
 
 for _, fileBaseName in pairs (toLoadKeywords) do
 	local moduleName = keywordsDir..fileBaseName
