@@ -9,7 +9,7 @@ SAConfig = {
 			{"KeywordTbl", "one/KeywordTbl.lua"},
 			{"keywords/StarBiwuShowOrders", "one/keywords/StarBiwuShowOrders.lua"},
 			{"keywords/J1900", "one/keywords/J1900.lua"},
-			{"keywords/L10", "one/keywords/L10.lua"},
+			{"keywords/WorkConfig", "one/keywords/WorkConfig.lua"},
 		},
 	},
 	
