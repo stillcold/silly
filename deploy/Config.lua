@@ -11,6 +11,7 @@ local config = {
 			{"encoded-codemgr-src/x_code_deploy_dir/keywords/StarBiwuShowOrders.lua" , 1, true},
 			{"encoded-codemgr-src/x_code_deploy_dir/keywords/J1900.lua" , 1, true},
 			{"encoded-codemgr-src/x_code_deploy_dir/keywords/WorkConfig.lua" , 1, true},
+			{"encoded-codemgr-src/x_code_deploy_dir/keywords/XEngineConfig.lua" , 1, true},
 		}
 	}
 	

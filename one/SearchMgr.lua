@@ -19,9 +19,13 @@ end
 for _, fileBaseName in pairs (toLoadKeywords) do
 	local moduleName = keywordsDir..fileBaseName
 	print("loading module for search "..moduleName)
-	local keywordsSubTbl = require (moduleName)
+	local keywordsSubTbl,extra = require (moduleName)
 	for k,v in pairs (keywordsSubTbl or {}) do
-		keywordTbl[k] = v
+		local longKey = k
+		if extra.title then
+			longKey = longKey..extra.title
+		end
+		keywordTbl[longKey] = v
 	end
 end
 

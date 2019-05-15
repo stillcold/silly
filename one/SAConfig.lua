@@ -10,6 +10,7 @@ SAConfig = {
 			{"keywords/StarBiwuShowOrders", "one/keywords/StarBiwuShowOrders.lua"},
 			{"keywords/J1900", "one/keywords/J1900.lua"},
 			{"keywords/WorkConfig", "one/keywords/WorkConfig.lua"},
+			{"keywords/XEngineConfig", "one/keywords/XEngineConfig.lua"},
 		},
 	},
 	
