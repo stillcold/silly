@@ -48,5 +48,7 @@ luac
 /deploy/BigFileEncoder.lua
 /deploy/SheeryEncoder.lua
 /deploy/encoded-codemgr-src/*.php
-/deploy/encoded-codemgr-src/x_code_deploy_dir/*.lua
-/deploy/encoded-codemgr-src/x_code_deploy_dir/keywords/*.lua
+/deploy/encoded-codemgr-src/x_code_deploy_dir
+
+#lualib
+/lualib/libChao_Lua
