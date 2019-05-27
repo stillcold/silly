@@ -30,12 +30,31 @@ for _, fileBaseName in pairs (toLoadKeywords) do
 	end
 end
 
+function searchMgr:IsAllKeywordMatch(toSearchTbl, keywordFromTbl)
+	for _,toSearchKey in ipairs(toSearchTbl) do
+		if not string.find(keywordFromTbl, toSearchKey) then
+			return false
+		end
+	end
+
+	return true
+end
+
+function searchMgr:GetSearchTblByInput(content)
+	local tosearchTbl = {}
+	for key in string.gmatch(content, "([^%+]+)") do
+		table.insert(tosearchTbl, key)
+	end
+	return tosearchTbl
+end
+
 function searchMgr:GetAnswer(content)
 	print("search text is: "..content.." lenth is "..#content)
+	local tosearchTbl = self:GetSearchTblByInput(content)
 	local ret = {}
 	local matchCount = 0
 	for keyword,richTxt in pairs(keywordTbl) do
-		if string.find(keyword, content) then
+		if self:IsAllKeywordMatch(tosearchTbl, keyword) then
 			local showTxt = self:ConvertToReadbleText(keyword, richTxt)
 			table.insert(ret,  showTxt)
 			matchCount = matchCount + 1
