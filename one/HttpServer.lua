@@ -3,6 +3,7 @@ local server = require "http.server"
 local searchMgr = require "SearchMgr"
 local write = server.write
 local httpIndex = require "Index"
+local console = require "sys.console"
 
 local dispatch = {}
 
@@ -69,3 +70,7 @@ server.listen(":8089", function(fd, request, body)
 	end
 end)
 
+
+console {
+	addr = ":2323"
+	}
