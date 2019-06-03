@@ -3,6 +3,44 @@ local searchMgr = {}
 
 local keywordTbl = require "KeywordTbl"
 
+function searchMgr:ParseKeywordPlain(tbl)
+    for k,v in pairs (tbl) do
+        tbl[k] = {content = v, priority = 0}
+    end
+
+    return tbl
+end
+
+function searchMgr:ParseKeywordByRule(keywordInfoTbl)
+
+    local tbl = {}
+    local keywordsSubTbl,extra = keywordInfoTbl[1], keywordInfoTbl[2]
+    if not extra or not extra.parseRule then
+        for k,v in pairs (keywordsSubTbl or {}) do
+		    local longKey = k
+		    if extra and extra.title then
+			    longKey = extra.title.."-"..longKey
+		    end
+		    tbl[longKey] = {content = v, priority = extra.priority or 0}
+	    end
+    elseif extra.parseRule == 1 then
+        for _,kvPair in ipairs (keywordsSubTbl or {}) do
+		    local longKey = kvPair[1]
+		    if extra and extra.title then
+			    longKey = extra.title.."-"..longKey
+		    end
+		    tbl[longKey] = {content = kvPair[2], priority = kvPair[3] or 0}
+	    end
+
+    end
+
+	return tbl
+end
+
+
+searchMgr:ParseKeywordPlain(keywordTbl)
+
+
 local keywordsDir = "keywords/"
 local allAlias = SAConfig.CodeConfig.Alias
 
@@ -20,15 +58,14 @@ for _, fileBaseName in pairs (toLoadKeywords) do
 	local moduleName = keywordsDir..fileBaseName
 	print("loading module for search "..moduleName)
 	local keywordInfoTbl = require (moduleName)
-	local keywordsSubTbl,extra = keywordInfoTbl[1], keywordInfoTbl[2]
-	for k,v in pairs (keywordsSubTbl or {}) do
-		local longKey = k
-		if extra and extra.title then
-			longKey = extra.title.."-"..longKey
-		end
-		keywordTbl[longKey] = v
-	end
+    local parsedTbl = searchMgr:ParseKeywordByRule(keywordInfoTbl)
+
+    for k,v in  pairs (parsedTbl) do
+        keywordTbl[k] = v
+    end
+
 end
+
 
 function searchMgr:IsAllKeywordMatch(toSearchTbl, keywordFromTbl)
 	for _,toSearchKey in ipairs(toSearchTbl) do
@@ -52,14 +89,24 @@ function searchMgr:GetAnswer(content)
 	print("search text is: "..content.." lenth is "..#content)
 	local tosearchTbl = self:GetSearchTblByInput(content)
 	local ret = {}
+    local candidate = {}
 	local matchCount = 0
 	for keyword,richTxt in pairs(keywordTbl) do
 		if self:IsAllKeywordMatch(tosearchTbl, keyword) then
-			local showTxt = self:ConvertToReadbleText(keyword, richTxt)
-			table.insert(ret,  showTxt)
+			local showTxt = self:ConvertToReadbleText(keyword, richTxt.content)
+			table.insert(candidate, {showTxt, richTxt.priority or 0})
 			matchCount = matchCount + 1
 		end
 	end
+
+    table.sort(candidate, function (a,b)
+        if a[2] > b[2] then return true end
+    end
+    )
+
+    for _,result in ipairs(candidate) do
+        table.insert(ret, result[1])
+    end
 
 	table.insert(ret, self:GetSummary(matchCount))
 	print("search hit count is "..matchCount)
@@ -78,7 +125,7 @@ function searchMgr:GetDetail(content)
 			matchCount = matchCount + 1
 			-- table.insert(ret, self:GetDetailTips(matchCount))
 
-			local showTxt = self:ConvertToReadbleCode(keyword, richTxt)
+			local showTxt = self:ConvertToReadbleCode(keyword, richTxt.content)
 			table.insert(ret,  showTxt)
 			
 		end
