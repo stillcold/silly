@@ -71,6 +71,7 @@ union sockaddr_full {
 
 // Why its name is wlist, what does "w" stand for?
 // As far as I can tell, this structure may be a Loop List
+// Now I believe it means Work-List.
 struct wlist {
 	struct wlist *next;
 	size_t size;
@@ -1381,10 +1382,13 @@ int
 x_socket_poll()
 {
 	int err;
+	// epoll event, socket poll event
 	sp_event_t *e;
 	struct socket *s;
 	struct x_socket *ss = SSOCKET;
 	eventwait(ss);
+	// This is a totaly different way to implement the epoll, it handle the cmd first.
+	// Then it handles the data after handles cmd.
 	err = cmd_process(ss);
 	if (err < 0)
 		return -1;
