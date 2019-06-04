@@ -31,7 +31,14 @@ function searchMgr:ParseKeywordByRule(keywordInfoTbl)
 		    end
 		    tbl[longKey] = {content = kvPair[2], priority = kvPair[3] or 0}
 	    end
-
+	elseif extra.parseRule == 2 then
+		for _,kvPair in ipairs(keywordsSubTbl or {}) do
+			local longKey = kvPair.key
+		    if extra and extra.title then
+			    longKey = extra.title.."-"..longKey
+		    end
+		    tbl[longKey] = {content = kvPair.richTxt, priority = kvPair.priority or 0}
+		end
     end
 
 	return tbl
