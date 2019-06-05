@@ -1313,6 +1313,7 @@ cmd_process(struct x_socket *ss)
 		return close;
 	if (count > ss->cmdcap)
 		resize_cmdbuf(ss, count);
+	// Read cmd from ctrlrecvfd.
 	pipe_blockread(ss->ctrlrecvfd, ss->cmdbuf, count);
 	ptr = ss->cmdbuf;
 	end = ptr + count;
