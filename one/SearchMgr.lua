@@ -4,42 +4,42 @@ local searchMgr = {}
 local keywordTbl = require "KeywordTbl"
 
 function searchMgr:ParseKeywordPlain(tbl)
-    for k,v in pairs (tbl) do
-        tbl[k] = {content = v, priority = 0}
-    end
+	for k,v in pairs (tbl) do
+		tbl[k] = {content = v, priority = 0}
+	end
 
-    return tbl
+	return tbl
 end
 
 function searchMgr:ParseKeywordByRule(keywordInfoTbl)
 
-    local tbl = {}
-    local keywordsSubTbl,extra = keywordInfoTbl[1], keywordInfoTbl[2]
-    if not extra or not extra.parseRule then
-        for k,v in pairs (keywordsSubTbl or {}) do
-		    local longKey = k
-		    if extra and extra.title then
-			    longKey = extra.title.."-"..longKey
-		    end
-		    tbl[longKey] = {content = v, priority = extra.priority or 0}
-	    end
-    elseif extra.parseRule == 1 then
-        for _,kvPair in ipairs (keywordsSubTbl or {}) do
-		    local longKey = kvPair[1]
-		    if extra and extra.title then
-			    longKey = extra.title.."-"..longKey
-		    end
-		    tbl[longKey] = {content = kvPair[2], priority = kvPair[3] or 0}
-	    end
+	local tbl = {}
+	local keywordsSubTbl,extra = keywordInfoTbl[1], keywordInfoTbl[2]
+	if not extra or not extra.parseRule then
+		for k,v in pairs (keywordsSubTbl or {}) do
+			local longKey = k
+			if extra and extra.title then
+				longKey = extra.title.."-"..longKey
+			end
+			tbl[longKey] = {content = v, priority = extra.priority or 0}
+		end
+	elseif extra.parseRule == 1 then
+		for _,kvPair in ipairs (keywordsSubTbl or {}) do
+			local longKey = kvPair[1]
+			if extra and extra.title then
+				longKey = extra.title.."-"..longKey
+			end
+			tbl[longKey] = {content = kvPair[2], priority = kvPair[3] or 0}
+		end
 	elseif extra.parseRule == 2 then
 		for _,kvPair in ipairs(keywordsSubTbl or {}) do
 			local longKey = kvPair.key
-		    if extra and extra.title then
-			    longKey = extra.title.."-"..longKey
-		    end
-		    tbl[longKey] = {content = kvPair.richTxt, priority = kvPair.priority or 0}
+			if extra and extra.title then
+				longKey = extra.title.."-"..longKey
+			end
+			tbl[longKey] = {content = kvPair.richTxt, priority = kvPair.priority or 0}
 		end
-    end
+	end
 
 	return tbl
 end
@@ -59,17 +59,21 @@ for idx,aliasTbl in pairs(allAlias) do
 		print(baseFileName)
 		table.insert(toLoadKeywords, baseFileName)
 	end
-end 
+end
+
+for _,fileName in pairs(global.__extraDownload or {}) do
+	table.insert(toLoadKeywords, fileName)
+end
 
 for _, fileBaseName in pairs (toLoadKeywords) do
 	local moduleName = keywordsDir..fileBaseName
 	print("loading module for search "..moduleName)
 	local keywordInfoTbl = require (moduleName)
-    local parsedTbl = searchMgr:ParseKeywordByRule(keywordInfoTbl)
+	local parsedTbl = searchMgr:ParseKeywordByRule(keywordInfoTbl)
 
-    for k,v in  pairs (parsedTbl) do
-        keywordTbl[k] = v
-    end
+	for k,v in  pairs (parsedTbl) do
+		keywordTbl[k] = v
+	end
 
 end
 
@@ -96,7 +100,7 @@ function searchMgr:GetAnswer(content)
 	print("search text is: "..content.." lenth is "..#content)
 	local tosearchTbl = self:GetSearchTblByInput(content)
 	local ret = {}
-    local candidate = {}
+	local candidate = {}
 	local matchCount = 0
 	for keyword,richTxt in pairs(keywordTbl) do
 		if self:IsAllKeywordMatch(tosearchTbl, keyword) then
@@ -106,20 +110,19 @@ function searchMgr:GetAnswer(content)
 		end
 	end
 
-    table.sort(candidate, function (a,b)
-        if a[2] > b[2] then return true end
-    end
-    )
+	table.sort(candidate, function (a,b)
+		if a[2] > b[2] then return true end
+	end
+	)
 
-    for _,result in ipairs(candidate) do
-        table.insert(ret, result[1])
-    end
+	for _,result in ipairs(candidate) do
+		table.insert(ret, result[1])
+	end
 
 	table.insert(ret, self:GetSummary(matchCount))
 	print("search hit count is "..matchCount)
 
-	-- local res = table.concat( ret, global.httpLineEndTag)
-	local res = table.concat( ret, "")
+	local res = table.concat( ret, "" )
 	return res
 end
 
@@ -130,15 +133,13 @@ function searchMgr:GetDetail(content)
 	for keyword,richTxt in pairs(keywordTbl) do
 		if keyword == content then
 			matchCount = matchCount + 1
-			-- table.insert(ret, self:GetDetailTips(matchCount))
-
 			local showTxt = self:ConvertToReadbleCode(keyword, richTxt.content)
 			table.insert(ret,  showTxt)
-			
+
 		end
 	end
 
-	local res = table.concat( ret, global.httpMultiLineTag)
+	local res = table.concat( ret, global.httpMultiLineTag )
 	return res
 end
 
@@ -148,7 +149,7 @@ function searchMgr:GetSummary(resultCount)
 	end
 
 	return global.summaryFailText
-	
+
 end
 
 function searchMgr:GetDetailTips(count)
@@ -160,7 +161,6 @@ function searchMgr:ConvertToReadbleText(keyword, richTxt)
 	richTxt = string.sub(richTxt, firstWordIdx or 1)
 	richTxt = string.gsub(richTxt, "\n", "<br>")
 	richTxt = httpIndex.SearchItemContentBegin..richTxt..httpIndex.SearchItemContentEnd
-	-- return global.httpBoldTagBegin..keyword..global.httpBoldTagEnd..global.httpLineEndTag..richTxt   
 	return httpIndex.SearchItemBegin..keyword..httpIndex.SearchItemMiddle..keyword..httpIndex.SearchItemEnd..richTxt   
 end
 
@@ -169,3 +169,4 @@ function searchMgr:ConvertToReadbleCode(keyword, richTxt)
 end
 
 return searchMgr
+
