@@ -70,4 +70,30 @@ function DbMgr:GetRecordByRemindTimeRange(LowTime, HighTime)
 	return res
 end
 
+function DbMgr:DeleteRecordById(id)
+
+	if not DbMgr.db then
+		self:SelectTable()
+	end
+
+	-- id = string.sub(id, 1, 10)
+
+	print(id)
+
+	if not id then return end
+
+	local statement = string.format ("delete from todo where id = %s",id)
+
+	print(statement)
+	local status,res = self.db:query(statement)
+	print(status, res)
+
+	for k,v in pairs(res) do
+		print(k,v)
+	end
+	
+	return res
+end
+
+
 return DbMgr

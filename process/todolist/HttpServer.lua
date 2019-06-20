@@ -45,6 +45,49 @@ dispatch["/search"] = function(fd, request, body)
 	local result = ""
 	for k,v in pairs (queryResult or {}) do
 		print(k,v.AllProps)
+		print(v.Id)
+		showTbl[v.Id] = v.AllProps
+		local jsonStr = v.AllProps
+		local jsonTbl = json.decode(jsonStr)
+		local text = jsonTbl.content
+		result = result..[[<a href = "delete?todoType=content&id=]]..v.Id..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
+	end
+	-- local result = json.encode(showTbl)
+	local body = httpIndex.SearchResultHead..result..httpIndex.SearchResultTail
+	local head = {
+		"Content-Type: text/html",
+		}
+	write(fd, 200, head, body)
+end
+
+
+
+dispatch["/delete"] = function(fd, request, body)
+	print("try delete")
+	-- write(fd, 200, {"Content-Type: text/plain"}, content)
+	if request.form then
+		content 	= request.form.todoType
+		editTarget 	= request.form.id
+	end
+
+	db:DeleteRecordById(editTarget)
+	
+	-- local body = httpIndex.SearchResultHead..searchMgr:GetAnswer(content)..httpIndex.SearchResultTail
+	local HighTime = os.time() + 24 * 3600
+	local LowTime = os.time() - 2 * 24 * 3600
+	if content == "today" or content == "today todo" or content == "今日任务" then
+		HighTime = os.time() + 24 * 3600
+	end
+	
+	if content == "week" or content == "week todo" or content == "本周任务" then
+		HighTime = os.time() + 2 * 7 * 24 * 3600
+	end
+	
+	local queryResult = db:GetRecordByRemindTimeRange(LowTime, HighTime)
+	local showTbl = {}
+	local result = ""
+	for k,v in pairs (queryResult or {}) do
+		print(k,v.AllProps)
 		showTbl[v.Id] = v.AllProps
 		result = result..v.AllProps.."<br>"
 	end
@@ -55,6 +98,10 @@ dispatch["/search"] = function(fd, request, body)
 		}
 	write(fd, 200, head, body)
 end
+
+
+
+
 
 -- Entry!
 server.listen(":8090", function(fd, request, body)

@@ -4,10 +4,10 @@ local tbl = {}
 
 tbl.Head = [===[
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD><TITLE>Coding Assist</TITLE>
+<HTML><HEAD><TITLE>今日目标</TITLE>
 <META content=text/html;charset=utf-8 http-equiv=Content-Type>
 <STYLE>BODY {
-	TEXT-ALIGN: center; FONT: 12px arial; BACKGROUND: #fff
+	TEXT-ALIGN: center; FONT: 34px arial; BACKGROUND: #fff
 }
 BODY {
 	PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; PADDING-TOP: 0px
@@ -49,7 +49,7 @@ A:active {
 	MARGIN: 0px 0px 4px -32px; FONT-SIZE: 16px
 }
 #nv A {
-	FONT-SIZE: 14px
+	FONT-SIZE: 24px
 }
 #nv B {
 	FONT-SIZE: 14px
@@ -110,15 +110,9 @@ A:active {
 <P id=lg><IMG src="http://120.24.98.130/search/bd_logo1.png" width=270 height=129 
 useMap=#mp></P>
 <P id=nv>
-<A href="http://naotu.baidu.com/">思&nbsp;维</A>　<B>网&nbsp;页</B>　
-<A href="https://baike.baidu.com/">百&nbsp;科</A>　
-<A href="http://zhidao.baidu.com/">知&nbsp;道</A>　
-<A href="http://120.24.98.130/todo.php">GTD</A>　
-<A href="http://image.baidu.com/">图&nbsp;片</A>　
-<A href="http://120.24.98.130/index.php">CRM</A>　
-<A href="http://map.baidu.com/">地&nbsp;图</A></P>
-<DIV id=fm>
-<FORM name=f action=search><INPUT id=kw maxLength=100 name=Hello><INPUT id=su value=百度一上 type=submit><SPAN id=hp></SPAN></FORM></DIV>
+<A href="search?Hello=all">全&nbsp;服</A>　<B>今&nbsp;日</B>　
+<A href="search?Hello=week">本&nbsp;周</A>　
+<A href="search?Hello=month">本&nbsp;月</A>　
 
 <P id=lm></P>
 
@@ -138,11 +132,11 @@ tbl.Tail = [===[
 
 tbl.SearchResultHead = [===[
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<TITLE>Coding Assist</TITLE>
+<TITLE>今日目标</TITLE>
 <META content=text/html;charset=utf-8 http-equiv=Content-Type>
 <STYLE>
 BODY {
-	TEXT-ALIGN: left; FONT: 14px arial; BACKGROUND: #fff
+	TEXT-ALIGN: left; FONT: 34px arial; BACKGROUND: #fff
 }
 BODY {
 	PADDING-BOTTOM: 0px; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; PADDING-TOP: 0px
@@ -194,7 +188,7 @@ WIDTH: 650px;margin-left:111px;
 MARGIN: 0px 0px 4px -32px; FONT-SIZE: 16px
 }
 #nv A {
-FONT-SIZE: 14px
+FONT-SIZE: 34px
 }
 #nv B {
 FONT-SIZE: 14px
@@ -260,12 +254,19 @@ overflow: hidden;
 
 </STYLE>
 <br>
-<DIV id=fm>
 
-	<FORM name=f action=search><img src="http://120.24.98.130/search/bd_logo1s.png"><INPUT id=kw maxLength=100 name=Hello><INPUT id=su value=百度一上 type=submit><SPAN id=hp></SPAN></FORM></DIV>
-
-	<P id=lm></P>
 <BODY>
+<DIV id=m>
+<P id=nv>
+<A href="search?Hello=all">全&nbsp;部</A>　
+<A href="search?Hello=today">今&nbsp;日</A>　
+<A href="search?Hello=week">本&nbsp;周</A>　
+<A href="search?Hello=month">本&nbsp;月</A>　
+
+<P id=lm></P>
+
+</DIV>
+
 	<DIV id=m>
 ]===]
 
