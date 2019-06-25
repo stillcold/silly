@@ -21,7 +21,7 @@ function searchMgr:ParseKeywordByRule(keywordInfoTbl)
 			if extra and extra.title then
 				longKey = extra.title.."-"..longKey
 			end
-			tbl[longKey] = {content = v, priority = extra.priority or 0}
+			tbl[longKey] = {content = v, priority = extra.priority or 0, title = extra.title, key = k}
 		end
 	elseif extra.parseRule == 1 then
 		for _,kvPair in ipairs (keywordsSubTbl or {}) do
@@ -29,7 +29,7 @@ function searchMgr:ParseKeywordByRule(keywordInfoTbl)
 			if extra and extra.title then
 				longKey = extra.title.."-"..longKey
 			end
-			tbl[longKey] = {content = kvPair[2], priority = kvPair[3] or 0}
+			tbl[longKey] = {content = kvPair[2], priority = kvPair[3] or 0, title = extra.title, key = kvPair[1]}
 		end
 	elseif extra.parseRule == 2 then
 		for _,kvPair in ipairs(keywordsSubTbl or {}) do
@@ -37,7 +37,7 @@ function searchMgr:ParseKeywordByRule(keywordInfoTbl)
 			if extra and extra.title then
 				longKey = extra.title.."-"..longKey
 			end
-			tbl[longKey] = {content = kvPair.richTxt, priority = kvPair.priority or 0}
+			tbl[longKey] = {content = kvPair.richTxt, priority = kvPair.priority or 0, title = extra.title, key = kvPair.key}
 		end
 	end
 
@@ -79,13 +79,20 @@ end
 
 
 function searchMgr:IsAllKeywordMatch(toSearchTbl, keywordFromTbl)
+	local totalCount = #toSearchTbl or 1
+	local matchedCount = 0
 	for _,toSearchKey in ipairs(toSearchTbl) do
-		if not string.find(keywordFromTbl, toSearchKey) then
-			return false
+		if string.find(keywordFromTbl, toSearchKey) then
+			matchedCount = matchedCount + 1
+			-- return false
 		end
 	end
 
-	return true
+	if matchedCount >= 1 then
+		return true, matchedCount * 10000 / totalCount
+	end
+
+	return false, 0
 end
 
 function searchMgr:GetSearchTblByInput(content)
@@ -96,6 +103,15 @@ function searchMgr:GetSearchTblByInput(content)
 	return tosearchTbl
 end
 
+function searchMgr:ConvetToRichTitle(key ,title, toSearchTbl)
+	local plainShowTxt = key.." - "..title
+	local ret = plainShowTxt
+	for _,toSearchKey in ipairs(toSearchTbl) do
+		ret = string.gsub(ret, toSearchKey, "<em>"..toSearchKey.."</em>")
+	end
+	return ret
+end
+
 function searchMgr:GetAnswer(content)
 	print("search text is: "..content.." lenth is "..#content)
 	local tosearchTbl = self:GetSearchTblByInput(content)
@@ -103,9 +119,12 @@ function searchMgr:GetAnswer(content)
 	local candidate = {}
 	local matchCount = 0
 	for keyword,richTxt in pairs(keywordTbl) do
-		if self:IsAllKeywordMatch(tosearchTbl, keyword) then
-			local showTxt = self:ConvertToReadbleText(keyword, richTxt.content)
-			table.insert(candidate, {showTxt, richTxt.priority or 0})
+		local bMatch, matchFactor = self:IsAllKeywordMatch(tosearchTbl, keyword)
+		if bMatch then
+			-- local showTitle = (richTxt.key or keyword).." - " .. richTxt.title
+			local showTitle = self:ConvetToRichTitle(richTxt.key or keyword, richTxt.title, tosearchTbl)
+			local showTxt = self:ConvertToReadbleText(keyword, richTxt.content, showTitle)
+			table.insert(candidate, {showTxt, richTxt.priority * matchFactor or 0})
 			matchCount = matchCount + 1
 		end
 	end
@@ -156,12 +175,12 @@ function searchMgr:GetDetailTips(count)
 	return global.httpBoldTagBegin..global.detialOkText..count..global.httpBoldTagEnd
 end
 
-function searchMgr:ConvertToReadbleText(keyword, richTxt)
+function searchMgr:ConvertToReadbleText(keyword, richTxt, showTitle)
 	local firstWordIdx = string.find(richTxt, "[%\n%S]")
 	richTxt = string.sub(richTxt, firstWordIdx or 1)
 	richTxt = string.gsub(richTxt, "\n", "<br>")
 	richTxt = httpIndex.SearchItemContentBegin..richTxt..httpIndex.SearchItemContentEnd
-	return httpIndex.SearchItemBegin..keyword..httpIndex.SearchItemMiddle..keyword..httpIndex.SearchItemEnd..richTxt   
+	return httpIndex.SearchItemBegin..keyword..httpIndex.SearchItemMiddle..showTitle..httpIndex.SearchItemEnd..richTxt   
 end
 
 function searchMgr:ConvertToReadbleCode(keyword, richTxt)
