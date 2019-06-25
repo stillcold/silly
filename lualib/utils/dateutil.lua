@@ -135,12 +135,28 @@ function DateUtil:GetYangLiNextDay(date)
 	return os.date("*t", date2Time + 24* 3600)
 end
 
-function DateUtil:IsSameDate(day1, day2)
-	if day1.year ~= day2.year then return false end
+function DateUtil:IsSameDate(day1, day2, bIgnoreYear)
+	if not bIgnoreYear then
+		if day1.year ~= day2.year then return false end
+	end
 	if day1.month ~= day2.month then return false end
 	if day1.day ~= day2.day then return false end
 
 	return true
+end
+
+function DateUtil:IsBirthdayDateNear(yangLiTime, nongliDate2, bIgnoreYear, range)
+	local base = yangLiTime
+	if range == -1 then return true end
+	if range > 10 then range = 10 end
+	for i = - range, range do
+		local targetDayTime = base + i * 24 * 3600
+		local targetDate = os.date("*t", targetDayTime)
+		local targetNongli = self:YangLi2NongLiDate({year = targetDate.year, month = targetDate.month, day = targetDate.day})
+		if self:IsSameDate(nongliDate2, targetNongli, true) then
+			return true
+		end
+	end
 end
 
 -- 阳历和农历比较,第一个参数是阳历,1表示前面的大,0表示相等
@@ -201,11 +217,11 @@ function DateUtil:__test_entry(bOPenDebug)
 	local st = {}
 	st.year = 2019
 	st.month = 6
-	st.day = 24
+	st.day = 25
 	self:YangLi2NongLiDate(st)
 	
 	
-	local target = {year = 1992, month = 1, day = 18}
+	local target = {year = 1992, month = 5, day = 23}
 	local res = self:NongLi2YangLiDate(target)
 	print("input is "..target.year,target.month,target.day,"\ntarget yangli is ", res.year, res.month, res.day)
 

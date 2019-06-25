@@ -105,6 +105,23 @@ function DbMgr:InsertBirthdayRecord(Name, AllProps)
 
 end
 
+
+function DbMgr:DeleteAllBirthdayRecord()
+	if not DbMgr.db then
+		self:SelectTable()
+	end
+
+	local statement = string.format ("delete from birthday")
+
+	print(statement)
+	local status,res = self.db:query(statement)
+	print(status, res)
+	for k,v in pairs (res) do
+		print(k,v)
+	end
+
+end
+
 function DbMgr:GetAllBirthdayRecord()
 	if not DbMgr.db then
 		self:SelectTable()
