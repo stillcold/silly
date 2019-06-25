@@ -50,7 +50,7 @@ dispatch["/search"] = function(fd, request, body)
 		local jsonStr = v.AllProps
 		local jsonTbl = json.decode(jsonStr)
 		local text = jsonTbl.content
-		result = result..[[<a href = "delete?todoType=content&id=]]..v.Id..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
+		result = result..[[<a href = "delete?todoType=]]..content..[[&id=]]..v.Id..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
 	-- local result = json.encode(showTbl)
 	local body = httpIndex.SearchResultHead..result..httpIndex.SearchResultTail
@@ -88,11 +88,16 @@ dispatch["/delete"] = function(fd, request, body)
 	local result = ""
 	for k,v in pairs (queryResult or {}) do
 		print(k,v.AllProps)
+		print(v.Id)
 		showTbl[v.Id] = v.AllProps
-		result = result..v.AllProps.."<br>"
+		local jsonStr = v.AllProps
+		local jsonTbl = json.decode(jsonStr)
+		local text = jsonTbl.content
+		result = result..[[<a href = "delete?todoType=]]..content..[[&id=]]..v.Id..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
 	-- local result = json.encode(showTbl)
 	local body = httpIndex.SearchResultHead..result..httpIndex.SearchResultTail
+
 	local head = {
 		"Content-Type: text/html",
 		}
