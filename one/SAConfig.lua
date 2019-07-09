@@ -11,8 +11,6 @@ SAConfig = {
 		Alias = {
 			{"Index", "one/Index.lua"},
 			{"KeywordTbl", "one/KeywordTbl.lua"},
-			{"keywords/Order1000", "one/keywords/Order1000.lua"},
-			{"keywords/Order1001", "one/keywords/Order1001.lua"},
 			{"keywords/J1900", "one/keywords/J1900.lua"},
 			{"keywords/XEngineConfig", "one/keywords/XEngineConfig.lua"},
 		},

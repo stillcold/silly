@@ -55,7 +55,7 @@ local toLoadKeywords = {}
 
 for idx,aliasTbl in pairs(allAlias) do
 	if string.find(aliasTbl[1], "keyword") then
-		local baseFileName = string.match(aliasTbl[2], "(%w+).lua")
+		local baseFileName = string.match(aliasTbl[2], "([%w_]+).lua")
 		print(baseFileName)
 		table.insert(toLoadKeywords, baseFileName)
 	end

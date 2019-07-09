@@ -41,7 +41,7 @@ function CodeMgr:DownLoadCode()
 
 		if status == 200 then
 			for fileName in string.gmatch(body, "([^|]+)") do
-				local toDownloadFilePrefix = string.match(fileName, "(%w+).lua")
+				local toDownloadFilePrefix = string.match(fileName, "([%w_]+).lua")
 				if toDownloadFilePrefix then
 					local downloadKey = toDownloadDirName.."/"..toDownloadFilePrefix
 					if not hasDownloaded[downloadKey] then
