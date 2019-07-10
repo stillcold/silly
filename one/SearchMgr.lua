@@ -82,7 +82,7 @@ function searchMgr:IsAllKeywordMatch(toSearchTbl, keywordFromTbl)
 	local totalCount = #toSearchTbl or 1
 	local matchedCount = 0
 	for _,toSearchKey in ipairs(toSearchTbl) do
-		if string.find(keywordFromTbl, toSearchKey) then
+		if string.find(string.lower(keywordFromTbl), string.lower(toSearchKey)) then
 			matchedCount = matchedCount + 1
 			-- return false
 		end
