@@ -148,7 +148,6 @@ end
 function DateUtil:IsBirthdayDateNear(yangLiTime, nongliDate2, bIgnoreYear, range)
 	local base = yangLiTime
 	if range == -1 then return true end
-	if range > 10 then range = 10 end
 	for i = - range, range do
 		local targetDayTime = base + i * 24 * 3600
 		local targetDate = os.date("*t", targetDayTime)

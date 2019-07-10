@@ -6,6 +6,7 @@ local console = require "sys.console"
 local db = require "DbMgr"
 local json = require "sys/json"
 local dateUtil = require "utils/dateutil"
+local httpClient = require "http.client"
 
 local dispatch = {}
 
@@ -23,6 +24,7 @@ dispatch["/"] = function(fd, reqeust, body)
 end
 
 local content = ""
+local cachedBirthday = {}
 
 dispatch["/search"] = function(fd, request, body)
 	-- write(fd, 200, {"Content-Type: text/plain"}, content)
@@ -67,13 +69,27 @@ dispatch["/search"] = function(fd, request, body)
 		local jsonStr = v.AllProps
 		local jsonTbl = json.decode(jsonStr)
 		local text = jsonTbl.content
-		result = result..[[<a href = "delete?todoType=]]..content..[[&id=]]..v.Id..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
+		result = result..[[<a href = "delete?todoType=]]..content..[[&id=]]..v.Id..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
 	
 	result = result.."<br>"
 	
 	-- 检查生日部分
 	local nowTime = os.time()
+	local isCacheHit = false
+	if cachedBirthday.expire and cachedBirthday.expire > nowTime then
+		if cachedBirthday[dayRange] then
+			
+			isCacheHit = true
+		end
+	else
+		cachedBirthday = {expire = (nowTime + 3600 *24)}
+	end
+
+if not isCacheHit then
+
+	local birthdayTxt = ""
+
 	local today = os.date("*t", nowTime)
 	queryResult = db:GetAllBirthdayRecord(LowTime, HighTime)
 	for k,v in pairs (queryResult or {}) do
@@ -95,7 +111,7 @@ dispatch["/search"] = function(fd, request, body)
 			if dateUtil:IsBirthdayDateNear(nowTime, birthdayDate, true, dayRange) then
 				local text = v.Name
 				local nongliText = "(农历 "..birthdayDate.year.."-"..birthdayDate.month.."-"..birthdayDate.day..")"
-				result = result..birthDayYangLiDate.month.."月"..birthDayYangLiDate.day.."日"..nongliText.."是<em>"..text.."</em>的生日"..[[<br>]]
+				birthdayTxt = birthdayTxt..birthDayYangLiDate.month.."月"..birthDayYangLiDate.day.."日"..nongliText.."是<em>"..text.."</em>的生日"..[[<br>]]
 			end
 			
 		-- 阳历
@@ -106,12 +122,16 @@ dispatch["/search"] = function(fd, request, body)
 			if yangLiTimeOfThisYear >= LowTime and yangLiTimeOfThisYear <= HighTime then
 				local text = v.Name
 				local yangliText = "(阳历 "..birthdayDate.year.."-"..birthdayDate.month.."-"..birthdayDate.day..")"
-				result = result..birthdayDate.month.."月"..birthdayDate.day.."日"..yangliText.."是<em>"..text.."</em>的生日"..[[<br>]]
+				birthdayTxt = birthdayTxt..birthdayDate.month.."月"..birthdayDate.day.."日"..yangliText.."是<em>"..text.."</em>的生日"..[[<br>]]
 			end
 		end
 		
 	end
+
+	cachedBirthday[dayRange] = birthdayTxt
 	
+end
+	result = result.. cachedBirthday[dayRange]
 	-- local result = json.encode(showTbl)
 	local body = httpIndex.SearchResultHead..result..httpIndex.SearchResultTail
 	local head = {
@@ -125,12 +145,17 @@ end
 dispatch["/delete"] = function(fd, request, body)
 	print("try delete")
 	-- write(fd, 200, {"Content-Type: text/plain"}, content)
+	local content, editTarget, text
 	if request.form then
 		content 	= request.form.todoType
 		editTarget 	= request.form.id
+		text  		= request.form.text
 	end
 
 	db:DeleteRecordById(editTarget)
+	local diarySaveInfoTbl = {keyworld = text, action = "add", tag = "text_from_todo"}
+	
+	httpClient.POST("http://127.0.0.1:80/diary/writedown.php", {"Content-Type: text/plain"}, json.encode(diarySaveInfoTbl))
 	
 	-- local body = httpIndex.SearchResultHead..searchMgr:GetAnswer(content)..httpIndex.SearchResultTail
 	local HighTime = os.time() + 24 * 3600
@@ -153,7 +178,7 @@ dispatch["/delete"] = function(fd, request, body)
 		local jsonStr = v.AllProps
 		local jsonTbl = json.decode(jsonStr)
 		local text = jsonTbl.content
-		result = result..[[<a href = "delete?todoType=]]..content..[[&id=]]..v.Id..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
+		result = result..[[<a href = "delete?todoType=]]..content..[[&id=]]..v.Id..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
 	-- local result = json.encode(showTbl)
 	local body = httpIndex.SearchResultHead..result..httpIndex.SearchResultTail

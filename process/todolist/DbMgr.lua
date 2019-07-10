@@ -23,7 +23,7 @@ end
 
 function DbMgr:InsertRecord(Id, RemindTime, AllProps, Name, FartherId, ChildId, BeginTime, EndTime)
 
-	if not DbMgr.db then
+	if not DbMgr.db or DbMgr.db.state ~= 1 then
 		self:SelectTable()
 	end
 
@@ -48,7 +48,7 @@ end
 
 function DbMgr:GetRecordByRemindTimeRange(LowTime, HighTime)
 
-	if not DbMgr.db then
+	if not DbMgr.db or DbMgr.db.state ~= 1 then
 		self:SelectTable()
 	end
 
@@ -63,7 +63,7 @@ end
 
 function DbMgr:DeleteRecordById(id)
 
-	if not DbMgr.db then
+	if not DbMgr.db or DbMgr.db.state ~= 1 then
 		self:SelectTable()
 	end
 
@@ -87,7 +87,7 @@ function DbMgr:DeleteRecordById(id)
 end
 
 function DbMgr:InsertBirthdayRecord(Name, AllProps)
-	if not DbMgr.db then
+	if not DbMgr.db or DbMgr.db.state ~= 1 then
 		self:SelectTable()
 	end
 
@@ -107,7 +107,7 @@ end
 
 
 function DbMgr:DeleteAllBirthdayRecord()
-	if not DbMgr.db then
+	if not DbMgr.db or DbMgr.db.state ~= 1 then
 		self:SelectTable()
 	end
 
@@ -123,7 +123,7 @@ function DbMgr:DeleteAllBirthdayRecord()
 end
 
 function DbMgr:GetAllBirthdayRecord()
-	if not DbMgr.db then
+	if not DbMgr.db or DbMgr.db.state ~= 1 then
 		self:SelectTable()
 	end
 
