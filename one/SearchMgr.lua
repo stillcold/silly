@@ -107,7 +107,10 @@ function searchMgr:ConvetToRichTitle(key ,title, toSearchTbl)
 	local plainShowTxt = key.." - "..title
 	local ret = plainShowTxt
 	for _,toSearchKey in ipairs(toSearchTbl) do
-		ret = string.gsub(ret, toSearchKey, "<em>"..toSearchKey.."</em>")
+		local ignoreCasePattern = string.gsub(toSearchKey, "(%a)", function(c)
+			return string.format("[%s%s]", string.lower(c), string.upper(c))
+		end)
+		ret = string.gsub(ret, ignoreCasePattern, "<em>".."%1".."</em>")
 	end
 	return ret
 end
