@@ -9,10 +9,10 @@ SAConfig = {
 			{"keywords", "extra"},
 		},
 		Alias = {
-			{"Index", "one/Index.lua"},
-			{"KeywordTbl", "one/KeywordTbl.lua"},
-			{"keywords/J1900", "one/keywords/J1900.lua"},
-			{"keywords/XEngineConfig", "one/keywords/XEngineConfig.lua"},
+			{"Index", "process/one/Index.lua"},
+			{"KeywordTbl", "process/one/KeywordTbl.lua"},
+			{"keywords/J1900", "process/one/keywords/J1900.lua"},
+			{"keywords/XEngineConfig", "process/one/keywords/XEngineConfig.lua"},
 		},
 	},
 	

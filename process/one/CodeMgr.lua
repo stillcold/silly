@@ -45,7 +45,7 @@ function CodeMgr:DownLoadCode()
 				if toDownloadFilePrefix then
 					local downloadKey = toDownloadDirName.."/"..toDownloadFilePrefix
 					if not hasDownloaded[downloadKey] then
-						self:DownloadOneFile(downloadKey, "one/"..toDownloadDirName.."/"..fileName)
+						self:DownloadOneFile(downloadKey, "process/one/"..toDownloadDirName.."/"..fileName)
 						global.__extraDownload = global.__extraDownload or {}
 						table.insert(global.__extraDownload, toDownloadFilePrefix)
 					end

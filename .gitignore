@@ -41,7 +41,7 @@ luac
 
 #Pribate files
 /one/KeywordTbl.lua
-/one/keywords/*.lua
+/process/one/keywords/*.lua
 /one/Index.lua
 
 # Deploy
