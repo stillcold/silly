@@ -104,7 +104,7 @@ function searchMgr:GetSearchTblByInput(content)
 end
 
 function searchMgr:ConvetToRichTitle(key ,title, toSearchTbl)
-	local plainShowTxt = key.." - "..title
+	local plainShowTxt = key.." - "..(title or "")
 	local ret = plainShowTxt
 	for _,toSearchKey in ipairs(toSearchTbl) do
 		local ignoreCasePattern = string.gsub(toSearchKey, "(%a)", function(c)
