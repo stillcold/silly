@@ -1,11 +1,12 @@
 local httpIndex = require "Index"
+local markdown = require "http.markdown"
 local searchMgr = {}
 
 local keywordTbl = require "KeywordTbl"
 
 function searchMgr:ParseKeywordPlain(tbl)
 	for k,v in pairs (tbl) do
-		tbl[k] = {content = v, priority = 0}
+		tbl[k] = {richTxt = v, priority = 0}
 	end
 
 	return tbl
@@ -13,15 +14,17 @@ end
 
 function searchMgr:ParseKeywordByRule(keywordInfoTbl)
 
+	local defaultTextType = "code"
 	local tbl = {}
 	local keywordsSubTbl,extra = keywordInfoTbl[1], keywordInfoTbl[2]
+
 	if not extra or not extra.parseRule then
 		for k,v in pairs (keywordsSubTbl or {}) do
 			local longKey = k
 			if extra and extra.title then
 				longKey = extra.title.."-"..longKey
 			end
-			tbl[longKey] = {content = v, priority = extra.priority or 0, title = extra.title, key = k}
+			tbl[longKey] = {richTxt = v, priority = extra.priority or 0, title = extra.title, key = k, textType = defaultTextType}
 		end
 	elseif extra.parseRule == 1 then
 		for _,kvPair in ipairs (keywordsSubTbl or {}) do
@@ -29,7 +32,7 @@ function searchMgr:ParseKeywordByRule(keywordInfoTbl)
 			if extra and extra.title then
 				longKey = extra.title.."-"..longKey
 			end
-			tbl[longKey] = {content = kvPair[2], priority = kvPair[3] or 0, title = extra.title, key = kvPair[1]}
+			tbl[longKey] = {richTxt = kvPair[2], priority = kvPair[3] or 0, title = extra.title, key = kvPair[1], textType = defaultTextType}
 		end
 	elseif extra.parseRule == 2 then
 		for _,kvPair in ipairs(keywordsSubTbl or {}) do
@@ -37,7 +40,7 @@ function searchMgr:ParseKeywordByRule(keywordInfoTbl)
 			if extra and extra.title then
 				longKey = extra.title.."-"..longKey
 			end
-			tbl[longKey] = {content = kvPair.richTxt, priority = kvPair.priority or 0, title = extra.title, key = kvPair.key}
+			tbl[longKey] = {richTxt = kvPair.richTxt, priority = kvPair.priority or 0, title = extra.title, key = kvPair.key, textType = kvPair.textType or defaultTextType}
 		end
 	end
 
@@ -121,13 +124,13 @@ function searchMgr:GetAnswer(content)
 	local ret = {}
 	local candidate = {}
 	local matchCount = 0
-	for keyword,richTxt in pairs(keywordTbl) do
+	for keyword,item in pairs(keywordTbl) do
 		local bMatch, matchFactor = self:IsAllKeywordMatch(tosearchTbl, keyword)
 		if bMatch then
-			-- local showTitle = (richTxt.key or keyword).." - " .. richTxt.title
-			local showTitle = self:ConvetToRichTitle(richTxt.key or keyword, richTxt.title, tosearchTbl)
-			local showTxt = self:ConvertToReadbleText(keyword, richTxt.content, showTitle)
-			table.insert(candidate, {showTxt, richTxt.priority * matchFactor or 0})
+			-- local showTitle = (item.key or keyword).." - " .. item.title
+			local showTitle = self:ConvetToRichTitle(item.key or keyword, item.title, tosearchTbl)
+			local showTxt = self:ConvertToReadbleSearchItem(keyword, item, showTitle)
+			table.insert(candidate, {showTxt, item.priority * matchFactor or 0})
 			matchCount = matchCount + 1
 		end
 	end
@@ -152,10 +155,10 @@ function searchMgr:GetDetail(content)
 	print("search text is: "..content.." lenth is "..#content)
 	local ret = {}
 	local matchCount = 0
-	for keyword,richTxt in pairs(keywordTbl) do
+	for keyword,item in pairs(keywordTbl) do
 		if keyword == content then
 			matchCount = matchCount + 1
-			local showTxt = self:ConvertToReadbleCode(keyword, richTxt.content)
+			local showTxt = self:ConvertToReadbleDetailTxt(keyword, item)
 			table.insert(ret,  showTxt)
 
 		end
@@ -178,16 +181,28 @@ function searchMgr:GetDetailTips(count)
 	return global.httpBoldTagBegin..global.detialOkText..count..global.httpBoldTagEnd
 end
 
-function searchMgr:ConvertToReadbleText(keyword, richTxt, showTitle)
+function searchMgr:ConvertToReadbleSearchItem(keyword, item, showTitle)
+	local richTxt = item.richTxt
+
 	local firstWordIdx = string.find(richTxt, "[%\n%S]")
 	richTxt = string.sub(richTxt, firstWordIdx or 1)
 	richTxt = string.gsub(richTxt, "\n", "<br>")
+
 	richTxt = httpIndex.SearchItemContentBegin..richTxt..httpIndex.SearchItemContentEnd
 	return httpIndex.SearchItemBegin..keyword..httpIndex.SearchItemMiddle..showTitle..httpIndex.SearchItemEnd..richTxt   
 end
 
-function searchMgr:ConvertToReadbleCode(keyword, richTxt)
+function searchMgr:ConvertToReadbleDetailTxt(keyword, item)
+	local richTxt = item.richTxt
+
+	if item.textType == "code" then
+		return httpIndex.CodeBegin..richTxt..httpIndex.CodeEnd   
+	elseif item.textType == "markdown" then
+		return markdown(richTxt)
+	end
+
 	return httpIndex.CodeBegin..richTxt..httpIndex.CodeEnd   
+
 end
 
 return searchMgr
