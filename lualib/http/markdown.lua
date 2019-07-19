@@ -909,11 +909,56 @@ local function line_breaks(text)
    return text:gsub("  +\n", " <br/>\n")
 end
 
+local function tables(text)
+   local lines = split(text)
+   local tableHead = {}
+
+   local tableDetect = false
+
+   for k,v in pairs(lines or {}) do
+	   if string.find(v, "|") then
+		   tableDetect = true
+		   break
+	   end
+   end
+
+   if not tableDetect then
+	   return text
+   end
+
+   local tableTxt = [[<table border="1">]]
+   local splitLineFound = false
+   for _,v in ipairs(lines or {}) do
+	   local items = split(v, "|")
+	   if not string.find(v, "---") then
+		   tableTxt = tableTxt.."<tr>"
+		   for __, item in ipairs(items or {}) do
+			   if item == "---" then
+				   splitLineFound = true
+			   else
+				   if not splitLineFound then
+					   tableTxt = tableTxt.."<th>"..item.."</th>"
+				   else
+					   tableTxt = tableTxt.."<td>"..item.."</td>"
+				   end
+			   end
+
+		   end
+		   tableTxt = tableTxt.."</tr>"
+	   else
+		   splitLineFound = true
+	   end
+   end
+   tableTxt = tableTxt..[[</table>]]
+   return tableTxt
+end
+
 -- Perform all span level transforms.
 function span_transform(text)
    text = code_spans(text)
    text = escape_special_chars(text)
    text = images(text)
+   text = tables(text)
    text = anchors(text)
    text = auto_links(text)
    text = amps_and_angles(text)
