@@ -43,6 +43,7 @@ luac
 /one/KeywordTbl.lua
 /process/one/keywords/*.lua
 /one/Index.lua
+/one/HtmlTags.lua
 
 # Deploy
 /deploy/BigFileEncoder.lua

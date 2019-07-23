@@ -2,13 +2,13 @@
 local server = require "http.server"
 local searchMgr = require "SearchMgr"
 local write = server.write
-local httpIndex = require "Index"
+local htmlTags = require "HtmlTags"
 local console = require "sys.console"
 
 local dispatch = {}
 
-local defaultHead = httpIndex.Head
-local defaultTail = httpIndex.Tail
+local defaultHead = htmlTags.Head
+local defaultTail = htmlTags.Tail
 local default = defaultHead..defaultTail
 
 dispatch["/"] = function(fd, reqeust, body)
@@ -41,7 +41,7 @@ dispatch["/search"] = function(fd, request, body)
 	if request.form.Hello then
 		content = request.form.Hello
 	end
-	local body = httpIndex.SearchResultHead..searchMgr:GetAnswer(content)..httpIndex.SearchResultTail
+	local body = htmlTags.SearchResultHead..searchMgr:GetAnswer(content)..htmlTags.SearchResultTail
 	local head = {
 		"Content-Type: text/html",
 		}
@@ -52,7 +52,7 @@ dispatch["/detail"] = function(fd, request, body)
 	if request.form.Hello then
 		content = request.form.Hello
 	end
-	local body = httpIndex.SearchResultHead..searchMgr:GetDetail(content)..httpIndex.SearchResultTail
+	local body = htmlTags.SearchResultHead..searchMgr:GetDetail(content)..htmlTags.SearchResultTail
 	local head = {
 		"Content-Type: text/html",
 		}
