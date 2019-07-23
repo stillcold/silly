@@ -42,8 +42,8 @@ luac
 #Pribate files
 /one/KeywordTbl.lua
 /process/one/keywords/*.lua
-/one/Index.lua
-/one/HtmlTags.lua
+process/one/Index.lua
+process/one/HtmlTags.lua
 
 # Deploy
 /deploy/BigFileEncoder.lua
