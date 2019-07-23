@@ -8,6 +8,12 @@ SAConfig = {
 		DownloadDir = {
 			{"keywords", "extra"},
 		},
+		LocalHttpDir = "E:/J/PhpStudyDir/";
+		MindMapConfig = {
+			GenDynamicFilePath = "/mnt/e/J/PhpStudyDir/".."mind/SkillSet/",
+			GenDynamicFileName = "bundle_dynamic.js";
+			--GenDynamicFileName = "t.txt";
+		},
 		Alias = {
 			{"Index", "process/one/Index.lua"},
 			{"KeywordTbl", "process/one/KeywordTbl.lua"},
