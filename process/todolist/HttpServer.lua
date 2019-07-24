@@ -101,6 +101,8 @@ dispatch["/search"] = function(fd, request, body)
 			
 			
 		end
+		local lineBeginDate = os.date("*t", v.RemindTime)
+		text = lineBeginDate.month.."月"..lineBeginDate.day.."日-"..text
 		result = result..[[<a href = "delete?todoType=]]..content..[[&id=]]..v.Id..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
 	
