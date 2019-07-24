@@ -65,6 +65,10 @@ dispatch["/search"] = function(fd, request, body)
 	local wdayCache = {}
 	local weekCache = {}
 	local dayOfYearCache = {}
+	local weekDayBeginTag = "<em>"
+	local weekDayEndTag = "</em>"
+	local lineDateBeginTag = "<i>"
+	local lineDateEndTag = "</i>"
 	
 	for k,v in pairs (queryResult or {}) do
 		print(k,v.AllProps)
@@ -81,6 +85,8 @@ dispatch["/search"] = function(fd, request, body)
 			local dateT = os.date("*t", v.RemindTime)
 			local dateR = tonumber(os.date("%W", v.RemindTime))
 			local dateY = tonumber(os.date("%j", v.RemindTime))
+			local weekDayBeginTag = "<em>"
+			local weekDayEndTag = "</em>"
 			
 			local wday = dateT.wday
 			wday = wday - 1
@@ -91,18 +97,18 @@ dispatch["/search"] = function(fd, request, body)
 			if not dayOfYearCache[dateY] then
 				dayOfYearCache[dateY] = 1
 				if dateR == nowDateW - 1 then
-					result = result.."<b>上周"..wday.."</b><br>"
+					result = result..weekDayBeginTag.."上周"..wday..weekDayEndTag.."<br>"
 				elseif dateR == nowDateW then
-					result = result.."<b>本周"..wday.."</b><br>"
-				elseif dateR == nowDateW then
-					result = result.."<b>下周"..wday.."</b><br>"
+					result = result..weekDayBeginTag.."本周"..wday..weekDayEndTag.."<br>"
+				elseif dateR == nowDateW + 1 then
+					result = result..weekDayBeginTag.."下周"..wday..weekDayEndTag.."<br>"
+				else
+					result = result..weekDayBeginTag.."较远"..weekDayEndTag.."<br>"
 				end
 			end
-			
-			
 		end
 		local lineBeginDate = os.date("*t", v.RemindTime)
-		text = lineBeginDate.month.."月"..lineBeginDate.day.."日-"..text
+		text = lineDateBeginTag..lineBeginDate.month.."月"..lineBeginDate.day.."日"..lineDateEndTag.."&nbsp&nbsp"..text
 		result = result..[[<a href = "delete?todoType=]]..content..[[&id=]]..v.Id..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
 	
@@ -209,7 +215,11 @@ dispatch["/delete"] = function(fd, request, body)
 	local wdayCache = {}
 	local weekCache = {}
 	local dayOfYearCache = {}
-	
+	local weekDayBeginTag = "<em>"
+	local weekDayEndTag = "</em>"
+	local lineDateBeginTag = "<i>"
+	local lineDateEndTag = "</i>"
+
 	for k,v in pairs (queryResult or {}) do
 		print(k,v.AllProps)
 		print(v.Id)
@@ -232,18 +242,18 @@ dispatch["/delete"] = function(fd, request, body)
 			if wday == 0 then
 				wday = "日"
 			end
-		
 			if not dayOfYearCache[dateY] then
 				dayOfYearCache[dateY] = 1
 				if dateR == nowDateW - 1 then
-					result = result.."<b>上周"..wday.."</b><br>"
+					result = result..weekDayBeginTag.."上周"..wday..weekDayEndTag.."<br>"
 				elseif dateR == nowDateW then
-					result = result.."<b>本周"..wday.."</b><br>"
-				elseif dateR == nowDateW then
-					result = result.."<b>下周"..wday.."</b><br>"
+					result = result..weekDayBeginTag.."本周"..wday..weekDayEndTag.."<br>"
+				elseif dateR == nowDateW + 1 then
+					result = result..weekDayBeginTag.."下周"..wday..weekDayEndTag.."<br>"
+				else
+					result = result..weekDayBeginTag.."较远"..weekDayEndTag.."<br>"
 				end
 			end
-			
 			
 		end
 		
