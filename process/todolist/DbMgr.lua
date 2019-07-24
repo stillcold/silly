@@ -52,7 +52,7 @@ function DbMgr:GetRecordByRemindTimeRange(LowTime, HighTime)
 		self:SelectTable()
 	end
 
-	local statement = string.format ("select * from todo where RemindTime > %.0f and RemindTime < %0.f",LowTime, HighTime)
+	local statement = string.format ("select * from todo where RemindTime > %.0f and RemindTime < %0.f order by RemindTime asc",LowTime, HighTime)
 
 	print(statement)
 	local status,res = self.db:query(statement)

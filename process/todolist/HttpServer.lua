@@ -62,6 +62,10 @@ dispatch["/search"] = function(fd, request, body)
 	local queryResult = db:GetRecordByRemindTimeRange(LowTime, HighTime)
 	local showTbl = {}
 	local result = ""
+	local wdayCache = {}
+	local weekCache = {}
+	local dayOfYearCache = {}
+	
 	for k,v in pairs (queryResult or {}) do
 		print(k,v.AllProps)
 		print(v.Id)
@@ -69,6 +73,34 @@ dispatch["/search"] = function(fd, request, body)
 		local jsonStr = v.AllProps
 		local jsonTbl = json.decode(jsonStr)
 		local text = jsonTbl.content
+		local nowTime = os.time()
+		local nowDateW = tonumber(os.date("%W", nowTime))
+		
+		if content == "week" or content == "week todo" or content == "本周任务" then
+		
+			local dateT = os.date("*t", v.RemindTime)
+			local dateR = tonumber(os.date("%W", v.RemindTime))
+			local dateY = tonumber(os.date("%j", v.RemindTime))
+			
+			local wday = dateT.wday
+			wday = wday - 1
+			if wday == 0 then
+				wday = "日"
+			end
+		
+			if not dayOfYearCache[dateY] then
+				dayOfYearCache[dateY] = 1
+				if dateR == nowDateW - 1 then
+					result = result.."<b>上周"..wday.."</b><br>"
+				elseif dateR == nowDateW then
+					result = result.."<b>本周"..wday.."</b><br>"
+				elseif dateR == nowDateW then
+					result = result.."<b>下周"..wday.."</b><br>"
+				end
+			end
+			
+			
+		end
 		result = result..[[<a href = "delete?todoType=]]..content..[[&id=]]..v.Id..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
 	
@@ -171,6 +203,11 @@ dispatch["/delete"] = function(fd, request, body)
 	local queryResult = db:GetRecordByRemindTimeRange(LowTime, HighTime)
 	local showTbl = {}
 	local result = ""
+	
+	local wdayCache = {}
+	local weekCache = {}
+	local dayOfYearCache = {}
+	
 	for k,v in pairs (queryResult or {}) do
 		print(k,v.AllProps)
 		print(v.Id)
@@ -178,6 +215,36 @@ dispatch["/delete"] = function(fd, request, body)
 		local jsonStr = v.AllProps
 		local jsonTbl = json.decode(jsonStr)
 		local text = jsonTbl.content
+		
+		local nowTime = os.time()
+		local nowDateW = tonumber(os.date("%W", nowTime))
+		
+		if content == "week" or content == "week todo" or content == "本周任务" then
+		
+			local dateT = os.date("*t", v.RemindTime)
+			local dateR = tonumber(os.date("%W", v.RemindTime))
+			local dateY = tonumber(os.date("%j", v.RemindTime))
+			
+			local wday = dateT.wday
+			wday = wday - 1
+			if wday == 0 then
+				wday = "日"
+			end
+		
+			if not dayOfYearCache[dateY] then
+				dayOfYearCache[dateY] = 1
+				if dateR == nowDateW - 1 then
+					result = result.."<b>上周"..wday.."</b><br>"
+				elseif dateR == nowDateW then
+					result = result.."<b>本周"..wday.."</b><br>"
+				elseif dateR == nowDateW then
+					result = result.."<b>下周"..wday.."</b><br>"
+				end
+			end
+			
+			
+		end
+		
 		result = result..[[<a href = "delete?todoType=]]..content..[[&id=]]..v.Id..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
 	-- local result = json.encode(showTbl)
