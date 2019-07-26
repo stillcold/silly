@@ -30,6 +30,7 @@ local desc = {
 "DEBUG: Enter Debug mode",
 }
 
+local bluamode = {}
 
 local console = {}
 
@@ -39,12 +40,20 @@ local function _patch(fixfile, module, ...)
 	local ENV = {}
 	local funcs = {}
 	local funcname = {...}
+	print("in _patch")
 	assert(#funcname > 0, "function list is empty")
+	print("1111")
 	setmetatable(ENV, envmt)
+	print("2222")
+	print("module is ", module)
 	local runm = require(module)
+	print("before loadfile", fixfile)
 	local fixm = assert(loadfile(fixfile, "bt", ENV))()
-	assert(runm and type(runm) == "table")
-	assert(fixm and type(fixm) == "table")
+	print("after loadfile")
+	assert(runm and type(runm) == "table", "run module is not table")
+	print("after asset 1")
+	assert(fixm and type(fixm) == "table", "fix module is not table")
+	print("after assert 2")
 	for k, v in pairs(funcname) do
 		local funcid = tonumber(v)
 		if funcid then
@@ -52,15 +61,20 @@ local function _patch(fixfile, module, ...)
 			v = funcid
 		end
 		local runf = assert(runm[v], "run code has no function")
+		print("after assert 3")
 		local fixf = assert(fixm[v], "fix code has no function")
+		print("after assert 4")
 		funcs[#funcs + 1] = fixf
 		funcs[#funcs + 1] = runf
 	end
+	print("fun patch")
 	patch(ENV, unpack(funcs))
+	print("after patch evn")
 	for k, v in pairs(funcname) do
 		runm[v] = assert(fixm[v])
 	end
-	return
+	print("to the end")
+	return true, "patch done"
 end
 
 
@@ -83,6 +97,19 @@ end
 function console.gc()
 	collectgarbage()
 	return format("Lua Mem Used:%.2f KiB", collectgarbage("count"))
+end
+
+function console.luamode(fd)
+	bluamode[fd] = true
+	return "now is lua mode"
+end
+
+function console.leavelua(fd)
+	bluamode[fd] = nil
+end
+
+function console.isluamode(fd)
+	return bluamode[fd]
 end
 
 function console.minfo(_, fmt)
@@ -153,11 +180,11 @@ function console.patch(_, fix, module, ...)
 		return "ERR lost the function name"
 	end
 	local ok, err = pcall(_patch, fix, module, ...)
-	local fmt = "Patch module:%s function:%s by:%s %s"
+	local fmt = "Patch module:%s by:%s functions:%s result:%s"
 	if ok then
-		return format(fmt, module, fix, "Success")
+		return format(fmt, module, fix, table.concat({...},",") or "", "Success")
 	else
-		return format(fmt, module, fix, err)
+		return format(fmt, module, fix, table.concat({...},",") or "", err or "error")
 	end
 end
 
@@ -172,13 +199,45 @@ function console.debug(fd)
 end
 
 local function process(fd, config, param, l)
+	local cmd = lower(param[1])
+	if console.isluamode(fd) then
+		if cmd == "exit" then
+			console.leavelua(fd)
+			return "leave lua mode"
+		end
+		local tbl = {}
+		local num = 0
+		local original_print = print
+		local f = function(...)
+			local t = {...}
+			local tmp = {}
+			for k, v in pairs(t) do
+				table.insert(tmp, tostring(v))
+			end
+			if num < 1000 then
+				table.insert(tbl, table.concat(tmp, "\t").."\n")
+			end
+			num = num + 1
+		end
+		print = f
+ 
+		local torunluascript = [=[xpcall( function() ]=] ..l..[=[ end, function(err) print(err) end)]=]
+		assert(load(torunluascript))()
+		print = original_print
+		local res = table.concat(tbl, "")
+		return res
+	end
 	if l == "\n" or l == "\r\n" then
 		return ""
 	end
 	if #param == 0 then
 		return format("ERR unknown '%s'\n", l)
 	end
-	local cmd = lower(param[1])
+	
+	if cmd == "lua" then
+		return console.luamode(fd)
+	end
+
 	local func = console[cmd]
 	if not func then
 		if config.cmd then
@@ -232,6 +291,7 @@ return function (config)
 				param[i] = nil
 			end
 		end
+		console.leavelua(fd)
 		core.log(addr, "leave")
 end)
 

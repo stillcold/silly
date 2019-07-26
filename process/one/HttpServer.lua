@@ -72,5 +72,5 @@ end)
 
 
 console {
-	addr = ":2323"
+	addr = ":1234"
 	}

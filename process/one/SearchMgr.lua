@@ -50,39 +50,43 @@ function searchMgr:ParseKeywordByRule(keywordInfoTbl)
 	return tbl
 end
 
+function searchMgr:Init(bReload)
+	self:ParseKeywordPlain(keywordTbl)
+	local keywordsDir = "keywords/"
+	local allAlias = SAConfig.CodeConfig.Alias
 
-searchMgr:ParseKeywordPlain(keywordTbl)
+	local toLoadKeywords = {}
 
-
-local keywordsDir = "keywords/"
-local allAlias = SAConfig.CodeConfig.Alias
-
-local toLoadKeywords = {}
-
-for idx,aliasTbl in pairs(allAlias) do
-	if string.find(aliasTbl[1], "keyword") then
-		local baseFileName = string.match(aliasTbl[2], "([%w_]+).lua")
-		print(baseFileName)
-		table.insert(toLoadKeywords, baseFileName)
-	end
-end
-
-for _,fileName in pairs(global.__extraDownload or {}) do
-	table.insert(toLoadKeywords, fileName)
-end
-
-for _, fileBaseName in pairs (toLoadKeywords) do
-	local moduleName = keywordsDir..fileBaseName
-	print("loading module for search "..moduleName)
-	local keywordInfoTbl = require (moduleName)
-	local parsedTbl = searchMgr:ParseKeywordByRule(keywordInfoTbl)
-
-	for k,v in  pairs (parsedTbl) do
-		keywordTbl[k] = v
+	for idx,aliasTbl in pairs(allAlias) do
+		if string.find(aliasTbl[1], "keyword") then
+			local baseFileName = string.match(aliasTbl[2], "([%w_]+).lua")
+			print(baseFileName)
+			table.insert(toLoadKeywords, baseFileName)
+		end
 	end
 
-end
+	for _,fileName in pairs(global.__extraDownload or {}) do
+		table.insert(toLoadKeywords, fileName)
+	end
 
+	for _, fileBaseName in pairs (toLoadKeywords) do
+		local moduleName = keywordsDir..fileBaseName
+		print("loading module for search "..moduleName)
+		local keywordInfoTbl 
+		if not bReload then
+			keywordInfoTbl = require (moduleName)
+		else
+			keywordInfoTbl = dofile("process/one/"..moduleName..".lua")
+		end
+		local parsedTbl = self:ParseKeywordByRule(keywordInfoTbl)
+
+		for k,v in  pairs (parsedTbl) do
+			keywordTbl[k] = v
+		end
+
+	end
+
+end
 
 function searchMgr:IsAllKeywordMatch(toSearchTbl, keywordFromTbl)
 	local totalCount = #toSearchTbl or 1
@@ -228,6 +232,8 @@ function searchMgr:ConvertToReadbleDetailTxt(keyword, item)
 	return htmlTags.CodeBegin..richTxt..htmlTags.CodeEnd   
 
 end
+
+searchMgr:Init()
 
 return searchMgr
 

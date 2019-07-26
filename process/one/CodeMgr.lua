@@ -29,6 +29,7 @@ end
 
 function CodeMgr:DownLoadCode()
 	local hasDownloaded = {}
+	global.__extraDownload = {}
 	for _, toDownload in pairs(CodeConfig.Alias) do
 		self:DownloadOneFile(toDownload[1], toDownload[2])
 		hasDownloaded[toDownload[1]] = true
@@ -46,7 +47,6 @@ function CodeMgr:DownLoadCode()
 					local downloadKey = toDownloadDirName.."/"..toDownloadFilePrefix
 					if not hasDownloaded[downloadKey] then
 						self:DownloadOneFile(downloadKey, "process/one/"..toDownloadDirName.."/"..fileName)
-						global.__extraDownload = global.__extraDownload or {}
 						table.insert(global.__extraDownload, toDownloadFilePrefix)
 					end
 				end
@@ -62,6 +62,9 @@ function CodeMgr:DownLoadCode()
 
 end
 
+function CodeMgr:TestPatch()
+	print("a")
+end
 
 return CodeMgr
 
