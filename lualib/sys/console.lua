@@ -28,6 +28,7 @@ local desc = {
 "CPUINFO: Show system time and user time statistics [CPUINFO]",
 "PATCH: Hot patch the code [PATCH <fixfile> <modulename> <funcname> ...]",
 "DEBUG: Enter Debug mode",
+"LUA: Enter Lua mode, eixt for leave lua mode",
 }
 
 local bluamode = {}
@@ -40,20 +41,12 @@ local function _patch(fixfile, module, ...)
 	local ENV = {}
 	local funcs = {}
 	local funcname = {...}
-	print("in _patch")
 	assert(#funcname > 0, "function list is empty")
-	print("1111")
 	setmetatable(ENV, envmt)
-	print("2222")
-	print("module is ", module)
 	local runm = require(module)
-	print("before loadfile", fixfile)
 	local fixm = assert(loadfile(fixfile, "bt", ENV))()
-	print("after loadfile")
 	assert(runm and type(runm) == "table", "run module is not table")
-	print("after asset 1")
 	assert(fixm and type(fixm) == "table", "fix module is not table")
-	print("after assert 2")
 	for k, v in pairs(funcname) do
 		local funcid = tonumber(v)
 		if funcid then
@@ -61,19 +54,14 @@ local function _patch(fixfile, module, ...)
 			v = funcid
 		end
 		local runf = assert(runm[v], "run code has no function")
-		print("after assert 3")
 		local fixf = assert(fixm[v], "fix code has no function")
-		print("after assert 4")
 		funcs[#funcs + 1] = fixf
 		funcs[#funcs + 1] = runf
 	end
-	print("fun patch")
 	patch(ENV, unpack(funcs))
-	print("after patch evn")
 	for k, v in pairs(funcname) do
 		runm[v] = assert(fixm[v])
 	end
-	print("to the end")
 	return true, "patch done"
 end
 

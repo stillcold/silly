@@ -258,10 +258,11 @@ overflow: hidden;
 <BODY>
 <DIV id=m>
 <P id=nv>
-<A href="search?Hello=all">全&nbsp;部</A>　
-<A href="search?Hello=today">今&nbsp;日</A>　
-<A href="search?Hello=week">本&nbsp;周</A>　
-<A href="search?Hello=month">本&nbsp;月</A>　
+<A href="search?Hello=all">全&nbsp;部</A>
+<A href="search?Hello=today">今&nbsp;日</A>
+<A href="search?Hello=week">本&nbsp;周</A>
+<A href="search?Hello=month">本&nbsp;月</A>
+<A href="search?Hello=weeklyReport">周&nbsp;报</A>
 
 <P id=lm></P>
 
