@@ -111,7 +111,7 @@ A:active {
 useMap=#mp></P>
 <P id=nv>
 <A href="search?Hello=all">全&nbsp;服</A>　<B>今&nbsp;日</B>　
-<A href="search?Hello=week">本&nbsp;周</A>　
+<A href="search?Hello=week">最&nbsp;近</A>　
 <A href="search?Hello=month">本&nbsp;月</A>　
 
 <P id=lm></P>
@@ -259,8 +259,8 @@ overflow: hidden;
 <DIV id=m>
 <P id=nv>
 <A href="search?Hello=all">全&nbsp;部</A>　
-<A href="search?Hello=week">今&nbsp;日</A>　
-<A href="search?Hello=week">本&nbsp;周</A>　
+<A href="search?Hello=today">今&nbsp;日</A>　
+<A href="search?Hello=week">最&nbsp;近</A>　
 <A href="search?Hello=month">本&nbsp;月</A>　
 
 <A href="search?Hello=weeklyReport">周&nbsp;报</A>

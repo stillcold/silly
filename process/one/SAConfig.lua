@@ -1,18 +1,21 @@
+local LocalConfig = require "LocalConfig"
+
 SAConfig = {
 	CodeConfig = {
-		Host = "127.0.0.1",
-		Port = "80",
-		PublicHttpHost = "10.240.163.122",
-		PublicHttpPort = "80",
+		Host = LocalConfig.InternalIp or "127.0.0.1",
+		Port = LocalConfig.InternalHttpPort or "80",
+		PublicHttpHost = LocalConfig.PublicHttpHost,
+		PublicHttpPort = LocalConfig.PublicHttpPort,
 		DownloadPreUrl = "DownloadCode.php?actionName=no&fileName=",
 		ListDirPreUrl = "DownloadCode.php?actionName=list&fileName=",
 		DownloadDir = {
 			{"keywords", "extra"},
 		},
-		LocalHttpDir = "E:/J/PhpStudyDir/";
+		LocalHttpDir = LocalConfig.HttpDir or "/var/www/html/",
+		LocalMindMapDir = LocalConfig.MindMapDir or "mind/SkillSet/",
 		MindMapConfig = {
-			GenDynamicFilePath = "/mnt/e/J/PhpStudyDir/".."mind/SkillSet/",
-			GenDynamicFileName = "bundle_dynamic.js";
+			GenDynamicFilePath = LocalConfig.HttpDir..LocalConfig.MindMapDir,
+			GenDynamicFileName = "bundle_dynamic.js",
 		},
 		Alias = {
 			{"HtmlTags", "process/one/HtmlTags.lua"},

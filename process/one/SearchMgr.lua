@@ -225,7 +225,7 @@ function searchMgr:ConvertToReadbleDetailTxt(keyword, item)
 	elseif item.textType == "mindmap" then
 		local testTbl = assert(load(richTxt))()
 		local newIdx = self:GenerateMindMapFile(testTbl)
-		local newHref = "http://"..codeConfig.PublicHttpHost..":"..codeConfig.PublicHttpPort.."/mind/skillSet/"..newIdx
+		local newHref = "http://"..codeConfig.PublicHttpHost..":"..codeConfig.PublicHttpPort.."/mind/SkillSet/"..newIdx
 		return htmlTags.httpRedirectScriptBegin..newHref..htmlTags.httpRedirectScriptEnd
 	end
 
