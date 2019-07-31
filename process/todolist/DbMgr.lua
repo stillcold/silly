@@ -111,6 +111,31 @@ function DbMgr:PostponeRecordById(id, remindTime)
 	return res
 end
 
+function DbMgr:AdvanceRecordById(id, remindTime)
+
+	if not DbMgr.db or DbMgr.db.state ~= 1 then
+		self:SelectTable()
+	end
+
+	-- id = string.sub(id, 1, 10)
+
+	print(id)
+
+	if not id then return end
+
+	local statement = string.format ("update todo set RemindTime = %.0f where id = %s", (remindTime - 24 * 3600), id)
+
+	print(statement)
+	local status,res = self.db:query(statement)
+	print(status, res)
+
+	for k,v in pairs(res) do
+		print(k,v)
+	end
+	
+	return res
+end
+
 function DbMgr:InsertBirthdayRecord(Name, AllProps)
 	if not DbMgr.db or DbMgr.db.state ~= 1 then
 		self:SelectTable()
