@@ -10,12 +10,23 @@ local dispatch = {}
 local defaultHead = htmlTags.Head
 local defaultTail = htmlTags.Tail
 local default = defaultHead..defaultTail
+local signedHead = htmlTags.HeadWithSign or defaultHead
 
-dispatch["/"] = function(fd, reqeust, body)
+local function checkRequest(request)
+	if request.form and request.form.sign == "antihack" then
+		return true
+	end
+end
+
+dispatch["/"] = function(fd, request, body)
 	local body = default
 	local head = {
 		"Content-Type: text/html",
 		}
+
+	if checkRequest(request) then
+		body = signedHead
+	end
 
 	write(fd, 200, head, body)
 end
@@ -38,6 +49,9 @@ dispatch["/upload"] = function(fd, request, body)
 end
 
 dispatch["/search"] = function(fd, request, body)
+	if not checkRequest(request) then
+		return
+	end
 	if request.form.Hello then
 		content = request.form.Hello
 	end
@@ -59,8 +73,12 @@ dispatch["/detail"] = function(fd, request, body)
 	write(fd, 200, head, body)
 end
 
+
+
 -- Entry!
 server.listen(":8089", function(fd, request, body)
+	
+
 	local c = dispatch[request.uri]
 	if c then
 		c(fd, request, body)

@@ -15,6 +15,11 @@ local defaultTail = httpIndex.Tail
 local default = defaultHead..defaultTail
 
 dispatch["/"] = function(fd, reqeust, body)
+	local sign = request and request.form and request.form.sign
+	if not sign or sign ~= "antihack" then
+		-- return
+	end
+
 	local body = default
 	local head = {
 		"Content-Type: text/html",

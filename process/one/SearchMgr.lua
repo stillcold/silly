@@ -199,6 +199,69 @@ function searchMgr:ConvertToReadbleSearchItem(keyword, item, showTitle)
 	return htmlTags.SearchItemBegin..keyword..htmlTags.SearchItemMiddle..showTitle..htmlTags.SearchItemEnd..richTxt   
 end
 
+function searchMgr:PreHandleJsonTbl(tbl)
+	local toExchange = {}
+	for k,v in pairs(tbl) do
+		if type(v) == "string" and type(k) == "number" then
+			toExchange[k] = v
+		end
+
+		if type(v) == "table" then
+			self:PreHandleJsonTbl(v)
+		end
+	end
+
+	for k,v in pairs(toExchange) do
+		tbl[k] = nil
+		tbl[v] = k
+	end
+end
+
+function searchMgr:RecoverAliasTblKey(tbl)
+	if not self._keyAlias then return tbl end
+
+	local toReplace = {}
+	for k,v in pairs(tbl) do
+		local aliasCorresponding = self._keyAlias[k]
+		if aliasCorresponding then
+			toReplace[k] = aliasCorresponding
+		end
+	end
+
+	for k,v in pairs(toReplace) do
+		tbl[v] = tbl[k]
+		tbl[k] = nil
+	end
+
+	for k,v in pairs(tbl) do
+		if type(v) == "table" then
+			self:RecoverAliasTblKey(v)
+		end
+	end
+end
+
+function searchMgr:RecoverColorTblKey(tbl)
+	if not self._colorAlias then return tbl end
+
+	local toReplace = {}
+	for k,v in pairs(tbl) do
+		if k == self._colorAlias then
+			toReplace[k] = ".level"
+		end
+	end
+
+	for k,v in pairs(toReplace) do
+		tbl[v] = tbl[k]
+		tbl[k] = nil
+	end
+
+	for k,v in pairs(tbl) do
+		if type(v) == "table" then
+			self:RecoverColorTblKey(v)
+		end
+	end
+end
+
 function searchMgr:GenerateMindMapFile(textTbl)
 	local mindMapConfig = SAConfig.CodeConfig.MindMapConfig
 	local dynamicJsFileName = mindMapConfig.GenDynamicFilePath..mindMapConfig.GenDynamicFileName
@@ -206,6 +269,10 @@ function searchMgr:GenerateMindMapFile(textTbl)
 	local head = htmlTags.mindmapBundleDynamicBegin
 	local tail = htmlTags.mindmapBundleDynamicEnd
 	f:write(head)
+	self:PreHandleJsonTbl(textTbl)
+	self:RecoverAliasTblKey(textTbl)
+	self:GetColorKeyword(textTbl)
+	self:RecoverColorTblKey(textTbl)
 	f:write(json.encode(textTbl))
 	f:write(tail)
 	f:close()
@@ -214,6 +281,31 @@ function searchMgr:GenerateMindMapFile(textTbl)
 	return htmlFileName
 end
 
+-- 替换括号(table初始化语句)中的key为非中文的字符,避免中文导致报错
+function searchMgr:ReplaceTblKeyInBracketsToASC(str)
+	self._keyAlias = {}
+
+	local idx = 1
+
+	local ret = string.gsub(str, "{(.-)}", function(c)
+		local new = string.gsub(c, "([^%s]+)%s+=", function(d)
+			idx = idx + 1
+			local cachedIdx ="c_"..idx
+			self._keyAlias[cachedIdx] = d
+			return cachedIdx.." ="
+		end)
+
+		return "{"..new.."}"
+	end)
+	return ret
+end
+
+function searchMgr:GetColorKeyword(tbl)
+	local kw = tbl.colorKeyword
+	if kw then
+		self._colorAlias = kw
+	end
+end
 
 function searchMgr:ConvertToReadbleDetailTxt(keyword, item)
 	local richTxt = item.richTxt
@@ -223,8 +315,10 @@ function searchMgr:ConvertToReadbleDetailTxt(keyword, item)
 	elseif item.textType == "markdown" then
 		return markdown(richTxt)
 	elseif item.textType == "mindmap" then
-		local testTbl = assert(load(richTxt))()
-		local newIdx = self:GenerateMindMapFile(testTbl)
+		richTxt = self:ReplaceTblKeyInBracketsToASC(richTxt)
+		local textTbl = assert(load(richTxt))()
+		self:GetColorKeyword(textTbl)
+		local newIdx = self:GenerateMindMapFile(textTbl)
 		local newHref = "http://"..codeConfig.PublicHttpHost..":"..codeConfig.PublicHttpPort.."/"..codeConfig.LocalMindMapDir..newIdx
 		return htmlTags.httpRedirectScriptBegin..newHref..htmlTags.httpRedirectScriptEnd
 	end
