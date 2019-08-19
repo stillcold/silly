@@ -50,6 +50,11 @@ end
 
 dispatch["/search"] = function(fd, request, body)
 	if not checkRequest(request) then
+		local head = {
+			"Content-Type: text/html",
+			}
+		local body = "并不是谁都能访问的"
+		write(fd, 200, head, body)
 		return
 	end
 	if request.form.Hello then
