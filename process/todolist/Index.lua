@@ -110,9 +110,9 @@ A:active {
 <P id=lg><IMG src="http://120.24.98.130/search/bd_logo1.png" width=270 height=129 
 useMap=#mp></P>
 <P id=nv>
-<A href="search?Hello=all">全&nbsp;服</A>　<B>今&nbsp;日</B>　
-<A href="search?Hello=week">最&nbsp;近</A>　
-<A href="search?Hello=month">本&nbsp;月</A>　
+<A href="search?sign=antihack&Hello=all">全&nbsp;服</A>　<B>今&nbsp;日</B>　
+<A href="search?sign=antihack&Hello=week">最&nbsp;近</A>　
+<A href="search?sign=antihack&Hello=month">本&nbsp;月</A>　
 
 <P id=lm></P>
 
@@ -258,12 +258,12 @@ overflow: hidden;
 <BODY>
 <DIV id=m>
 <P id=nv>
-<A href="search?Hello=all">全&nbsp;部</A>　
-<A href="search?Hello=today">今&nbsp;日</A>　
-<A href="search?Hello=week">最&nbsp;近</A>　
-<A href="search?Hello=month">本&nbsp;月</A>　
+<A href="search?sign=antihack&Hello=all">全&nbsp;部</A>　
+<A href="search?sign=antihack&Hello=today">今&nbsp;日</A>　
+<A href="search?sign=antihack&Hello=week">最&nbsp;近</A>　
+<A href="search?sign=antihack&Hello=month">本&nbsp;月</A>　
 
-<A href="search?Hello=weeklyReport">周&nbsp;报</A>
+<A href="search?sign=antihack&Hello=weeklyReport">周&nbsp;报</A>
 
 <P id=lm></P>
 

@@ -14,16 +14,26 @@ local defaultHead = httpIndex.Head
 local defaultTail = httpIndex.Tail
 local default = defaultHead..defaultTail
 
-dispatch["/"] = function(fd, reqeust, body)
+local function checkValidRequest(request)
 	local sign = request and request.form and request.form.sign
 	if not sign or sign ~= "antihack" then
-		-- return
+		return
 	end
+	return true
+end
 
+dispatch["/"] = function(fd, request, body)
+
+	
 	local body = default
 	local head = {
 		"Content-Type: text/html",
 		}
+
+	if not checkValidRequest(request) then
+		write(fd, 200, head, "access deny.")
+		return
+	end
 
 	write(fd, 200, head, body)
 end
@@ -32,6 +42,16 @@ local content = ""
 local cachedBirthday = {}
 
 dispatch["/search"] = function(fd, request, body)
+	
+	local body = default
+	local head = {
+		"Content-Type: text/html",
+		}
+
+	if not checkValidRequest(request) then
+		write(fd, 200, head, "access deny.")
+		return
+	end
 	-- write(fd, 200, {"Content-Type: text/plain"}, content)
 	if request.form.Hello then
 		content = request.form.Hello
@@ -114,9 +134,9 @@ dispatch["/search"] = function(fd, request, body)
 		end
 		local lineBeginDate = os.date("*t", v.RemindTime)
 		local textWithDate = lineDateBeginTag..lineBeginDate.month.."月"..lineBeginDate.day.."日"..lineDateEndTag.."&nbsp&nbsp"..text
-		result = result..[[<a href = "advance?todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">advance</a>&nbsp;&nbsp;]]
-		result = result..[[<a href = "postpone?todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">postpone</a>&nbsp;&nbsp;]]
-		result = result..[[<a href = "delete?todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..textWithDate..[[<br>]]
+		result = result..[[<a href = "advance?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">advance</a>&nbsp;&nbsp;]]
+		result = result..[[<a href = "postpone?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">postpone</a>&nbsp;&nbsp;]]
+		result = result..[[<a href = "delete?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..textWithDate..[[<br>]]
 	end
 	
 	result = result.."<br>"
@@ -203,6 +223,17 @@ end
 
 
 dispatch["/delete"] = function(fd, request, body)
+
+	local body = default
+	local head = {
+		"Content-Type: text/html",
+		}
+
+	if not checkValidRequest(request) then
+		write(fd, 200, head, "access deny.")
+		return
+	end
+	
 	print("try delete")
 	-- write(fd, 200, {"Content-Type: text/plain"}, content)
 	local content, editTarget, text
@@ -291,9 +322,9 @@ dispatch["/delete"] = function(fd, request, body)
 			
 		end
 		
-		result = result..[[<a href = "advance?todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">advance</a>&nbsp;&nbsp;]]
-		result = result..[[<a href = "postpone?todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">postpone</a>&nbsp;&nbsp;]]
-		result = result..[[<a href = "delete?todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
+		result = result..[[<a href = "advance?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">advance</a>&nbsp;&nbsp;]]
+		result = result..[[<a href = "postpone?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">postpone</a>&nbsp;&nbsp;]]
+		result = result..[[<a href = "delete?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
 	-- local result = json.encode(showTbl)
 	local body = httpIndex.SearchResultHead..result..httpIndex.SearchResultTail
@@ -306,6 +337,16 @@ end
 
 
 dispatch["/postpone"] = function(fd, request, body)
+
+	local body = default
+	local head = {
+		"Content-Type: text/html",
+		}
+
+	if not checkValidRequest(request) then
+		write(fd, 200, head, "access deny.")
+		return
+	end
 	print("try postpone")
 	-- write(fd, 200, {"Content-Type: text/plain"}, content)
 	local content, editTarget, text
@@ -395,9 +436,9 @@ dispatch["/postpone"] = function(fd, request, body)
 			
 		end
 		
-		result = result..[[<a href = "advance?todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">advance</a>&nbsp;&nbsp;]]
-		result = result..[[<a href = "postpone?todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">postpone</a>&nbsp;&nbsp;]]
-		result = result..[[<a href = "delete?todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
+		result = result..[[<a href = "advance?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">advance</a>&nbsp;&nbsp;]]
+		result = result..[[<a href = "postpone?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">postpone</a>&nbsp;&nbsp;]]
+		result = result..[[<a href = "delete?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
 	-- local result = json.encode(showTbl)
 	local body = httpIndex.SearchResultHead..result..httpIndex.SearchResultTail
@@ -410,6 +451,15 @@ end
 
 
 dispatch["/advance"] = function(fd, request, body)
+	local body = default
+	local head = {
+		"Content-Type: text/html",
+		}
+
+	if not checkValidRequest(request) then
+		write(fd, 200, head, "access deny.")
+		return
+	end
 	print("try advance")
 	-- write(fd, 200, {"Content-Type: text/plain"}, content)
 	local content, editTarget, text
@@ -499,9 +549,9 @@ dispatch["/advance"] = function(fd, request, body)
 			
 		end
 		
-		result = result..[[<a href = "advance?todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">advance</a>&nbsp;&nbsp;]]
-		result = result..[[<a href = "postpone?todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">postpone</a>&nbsp;&nbsp;]]
-		result = result..[[<a href = "delete?todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
+		result = result..[[<a href = "advance?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">advance</a>&nbsp;&nbsp;]]
+		result = result..[[<a href = "postpone?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">postpone</a>&nbsp;&nbsp;]]
+		result = result..[[<a href = "delete?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
 	-- local result = json.encode(showTbl)
 	local body = httpIndex.SearchResultHead..result..httpIndex.SearchResultTail

@@ -54,6 +54,10 @@ dispatch["/search"] = function(fd, request, body)
 			"Content-Type: text/html",
 			}
 		local body = "并不是谁都能访问的"
+
+		if htmlTags.SearchResultNoSignHead then
+			body = htmlTags.SearchResultNoSignHead.."并不是谁都能访问的"..htmlTags.SearchResultTail
+		end
 		write(fd, 200, head, body)
 		return
 	end

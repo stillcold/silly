@@ -262,6 +262,29 @@ function searchMgr:RecoverColorTblKey(tbl)
 	end
 end
 
+function searchMgr:HandlePredifinedKeyWord(tbl)
+	for k,v in pairs(tbl) do
+		if k == "URL" then
+			tbl[".url"] = v
+			tbl[k] = nil
+		end
+		if k == "NOTE" then
+			tbl[".note"] = v
+			tbl[k] = nil
+		end
+		if k == "NOEXP" then
+			tbl[".noExpand"] = v
+			tbl[k] = nil
+		end
+	end
+	
+	for k,v in pairs(tbl) do
+		if type(v) == "table" then
+			self:HandlePredifinedKeyWord(v)
+		end
+	end
+end
+
 function searchMgr:GenerateMindMapFile(textTbl)
 	local mindMapConfig = SAConfig.CodeConfig.MindMapConfig
 	local dynamicJsFileName = mindMapConfig.GenDynamicFilePath..mindMapConfig.GenDynamicFileName
@@ -273,6 +296,7 @@ function searchMgr:GenerateMindMapFile(textTbl)
 	self:RecoverAliasTblKey(textTbl)
 	self:GetColorKeyword(textTbl)
 	self:RecoverColorTblKey(textTbl)
+	self:HandlePredifinedKeyWord(textTbl)
 	f:write(json.encode(textTbl))
 	f:write(tail)
 	f:close()
