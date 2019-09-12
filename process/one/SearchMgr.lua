@@ -264,25 +264,35 @@ end
 
 function searchMgr:HandlePredifinedKeyWord(tbl)
 	for k,v in pairs(tbl) do
-		if k == "URL" then
-			tbl[".url"] = v
-			tbl[k] = nil
-		end
-		if k == "NOTE" then
-			tbl[".note"] = v
-			tbl[k] = nil
-		end
-		if k == "NOEXP" then
-			tbl[".noExpand"] = v
-			tbl[k] = nil
-		end
-	end
-	
-	for k,v in pairs(tbl) do
 		if type(v) == "table" then
 			self:HandlePredifinedKeyWord(v)
 		end
 	end
+
+	for k,v in pairs(tbl) do
+		if k == "URL" then
+			tbl[".url"] = v
+			break
+		end
+	end
+	
+	for k,v in pairs(tbl) do
+		if k == "NOTE" then
+			tbl[".note"] = v
+			break
+		end
+	end
+	
+	for k,v in pairs(tbl) do
+		if k == "UNFOLD" then
+			tbl[".noExpand"] = v
+			break
+		end
+	end
+
+	tbl["URL"] = nil
+	tbl["NOTE"] = nil
+	tbl["UNFOLD"] = nil
 end
 
 function searchMgr:GenerateMindMapFile(textTbl)
@@ -292,6 +302,7 @@ function searchMgr:GenerateMindMapFile(textTbl)
 	local head = htmlTags.mindmapBundleDynamicBegin
 	local tail = htmlTags.mindmapBundleDynamicEnd
 	f:write(head)
+	f:write("\n")
 	self:PreHandleJsonTbl(textTbl)
 	self:RecoverAliasTblKey(textTbl)
 	self:GetColorKeyword(textTbl)
