@@ -2,6 +2,7 @@ local htmlTags = require "HtmlTags"
 local markdown = require "http.markdown"
 local searchMgr = {}
 local json = require"sys.json"
+local CodeMgr = require "CodeMgr"
 
 local keywordTbl = require "KeywordTbl"
 
@@ -85,7 +86,12 @@ function searchMgr:Init(bReload)
 		end
 
 	end
+end
 
+function searchMgr:OnRefreshTick()
+	global.__extraDownload = {}
+	CodeMgr:DownLoadCode()
+	self:Init(true)
 end
 
 function searchMgr:IsAllKeywordMatch(toSearchTbl, keywordFromTbl)
@@ -363,6 +369,11 @@ function searchMgr:ConvertToReadbleDetailTxt(keyword, item)
 end
 
 searchMgr:Init()
+
+RegisterTick(function()
+	searchMgr:OnRefreshTick()
+end, 1000 * 60 * 10 )
+
 
 return searchMgr
 

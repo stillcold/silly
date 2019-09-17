@@ -1,5 +1,6 @@
 local client = require "http.client"
-
+local core = require "sys.core"
+require "sys.tick"
 local CodeConfig = SAConfig.CodeConfig
 
 local CodeMgr = {}
@@ -57,7 +58,7 @@ function CodeMgr:DownLoadCode()
 	end
 
 	print("Code all set, start all modules now...")
-
+	
 	require "HttpServer"
 
 end
