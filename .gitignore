@@ -53,3 +53,6 @@ process/one/HtmlTags.lua
 
 #lualib
 /lualib/libChao_Lua
+
+#log
+/log
