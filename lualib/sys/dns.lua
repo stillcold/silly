@@ -270,7 +270,7 @@ local function lookup(name)
 end
 
 local function isname(name)
-	local right = name:match("([%x])", #name)
+	local right = name:match("([%d])", #name)
 	if right then
 		return false
 	end

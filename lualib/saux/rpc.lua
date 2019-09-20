@@ -132,6 +132,20 @@ function server.listen(self)
 	return fd
 end
 
+function server.call(self, fd, cmd, body)
+
+	local rpcproto = self.config.proto
+	local cmd = rpcproto:tag(cmd)
+	local session = core.genid()
+	local hdrdat = pack("<I4I4", session, cmd)
+	local bodydat = rpcproto:encode(cmd, body)
+	local full = rpcproto:pack(hdrdat .. bodydat)
+	core.write(fd, np.pack(full))
+
+	-- todo 
+	-- return waitfor(self, session)
+end
+
 function server.close(self)
 	gc(self)
 end
@@ -181,6 +195,7 @@ local function doconnect(self)
 	local config = self.config
 	local close = config.close
 	local rpcproto = config.proto
+	local call = config.call
 	local queue = np.create()
 	function EVENT.close(fd, errno)
 		local ok, err = core.pcall(close, fd, errno)
@@ -213,7 +228,27 @@ local function doconnect(self)
 			--ack
 			local waitpool = self.waitpool
 			local co = waitpool[session]
-			if not co then --timeout
+			
+			--timeout or new rpc call
+			if not co then
+				-- check if there is call handle
+				if call then
+					local ok, cmd, res = core.pcall(call, fd, cmd, body)
+					if not ok or not cmd then
+						core.log("[rpc.client] dispatch socket", cmd)
+						return
+					end
+					--ack
+					if type(cmd) == "string" then
+						cmd = rpcproto:tag(cmd)
+					end
+					local hdrdat = pack("<I4I4", session, cmd)
+					local bodydat = rpcproto:encode(cmd, res)
+					local full = rpcproto:pack(hdrdat .. bodydat)
+					core.write(fd, np.pack(full))
+				
+				end
+				
 				return
 			end
 			waitpool[session] = nil
