@@ -22,13 +22,16 @@ core.start(function()
 		addr = ip..":"..port,
 		proto = rpcproto,
 		timeout = 5000,
+		call = function (fd, cmd, msg)
+			cole.log("rpc call in")
+		end,
 		close = function(fd, errno)
 			core.log("close", fd, errno)
 		end
 	}
 
 
-	local ok = rpcclient:connect()
+	local ok = g_RpcClient:connect()
 	core.log("rpc connect status", ok)
 	assert(ok)
 	g_RpcClient:call("rrpc_sum", {val1 = 1, val2 = 2, suffix = "test"})
