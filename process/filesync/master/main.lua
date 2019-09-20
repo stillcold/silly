@@ -22,6 +22,8 @@ local server = rpc.createserver {
 	accept = function(fd, addr)
 		print("accept", addr)
 		core.log("accept", fd, addr)
+
+		self:call(fd, "name", {val = 1})
 	end,
 	close = function(fd, errno)
 		core.log("close", fd, errno)
