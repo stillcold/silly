@@ -17,16 +17,26 @@ arpc_sum 0x2002 {
 	.suffix:string 2
 }
 
-rrpc_name 0x2003 {
-	.val:interger 1
-	.suffix:string 2
+Handshake 0x2003 {
+	.name:string 1
 }
 
-arpc_name 0x2004 {
+HandshakeDone 0x2004 {
 	.val:string 1
+}
+
+rrpc_name 0x2005 {
+	.val:integer 1
 	.suffix:string 2
 }
 
+GetSearchRepoOverview 0x2006 {
+	
+}
+
+ReplySearchRepoOverview 0x2007 {
+	.overview:string 1
+}
 
 ]]
 
