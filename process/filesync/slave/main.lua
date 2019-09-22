@@ -13,6 +13,15 @@ g_RpcClient = nil
 
 print(lfs.currentdir())
 
+function writeToFile(path, content)
+	local file = io.open(path, "wb")
+	if not file then return end
+
+	file:write(content)
+
+	file:close()
+end
+
 core.start(function()
 	
 	-- 转成IPV4格式的ip地址
@@ -66,36 +75,79 @@ core.start(function()
 			local fullPath = dirPath.."/"..filePath
 			local att = lfs.attributes(fullPath)
 	
-			overview_local[filePath] = {}
+			overview_local[filePath]= {}
 			overview_local[filePath].size = att.size or 0
 			overview_local[filePath].modification = att.modification or 0
+			print("find local file att", filePath, att.size, att.mofication)
 		end
 	end
 
-	local benchmarkLow = core.envget("benchmark_seira_low")
-	local benchmarkHigh = core.envget("benchmark_seria_high")
+	local benchmarkLow = tonumber(core.envget("benchmark_seria_low"))
+	local benchmarkHigh = tonumber(core.envget("benchmark_seria_high"))
 
 	local toUseMasterFile = {}
 
 	result = g_RpcClient:call("GetSearchRepoOverview", {})
 	local overview_master = unserialize(result.overview)
 	for filePath,att in pairs(overview_master) do
-		local localAtt = overview_local[filePath] or {}
-		if att.size ~= localAtt.size then
+		local localAtt = overview_local[filePath]
+		if not localAtt then
+			print("no local file found, will use matser file", filePath)
+			toUseMasterFile[filePath] = 1
+		end
+		if localAtt and att.size ~= localAtt.size and att.size then
 			local fileflag = string.match(filePath, "(%d+)") or 0
 			local fileSerialNum = tonumber(fileflag)
 
 			if fileSerialNum > benchmarkHigh or fileSerialNum < benchmarkLow then
 				toUseMasterFile[filePath] = 1
+				print("local is not benchmark, will use master file", filePath)
+			elseif localAtt.size and localAtt.size > 0 then
+				local fullPath = dirPath.."/"..filePath
+				print("will upload local file to master,", fullPath)
+				local file = io.open(fullPath, "rb")
+				if file then
+					local content = file:read("*a")
+					file:close()
+					result = g_RpcClient:call("UploadSlaveFileContent",{fileName = filePath, fileContent = content})
+				end
+			end
+		end
+
+	end
+
+	print("handle all done")
+
+	for filePath, _ in pairs(toUseMasterFile) do
+		print("get file from master:", filePath)
+		result = g_RpcClient:call("GetMasterFileContent", {fileName = filePath})
+		local fileContent = result.fileContent
+
+		if fileContent then
+			local fullPath = dirPath.."/"..filePath
+			writeToFile(fullPath, fileContent)
+		end
+	end
+	
+	local privateLow = tonumber(core.envget("private_seria_low"))
+	local privateHigh = tonumber(core.envget("private_seria_high"))
+
+	for filePath, _ in pairs(overview_local) do
+		local fileflag = string.match(filePath, "(%d+)") or 0
+		local fileSerialNum = tonumber(fileflag)
+
+		if not overview_master[filePath] and not(fileSerialNum >= privateLow and fileSerialNum <= privateHigh) then
+			local fullPath = dirPath.."/"..filePath
+			local file = io.open(fullPath, "rb")
+			if file then
+				local content = file:read("*a")
+				file:close()
+				local ret = g_RpcClient:call("UploadSlaveFileContent",{fileName = filePath, fileContent = content})
 			end
 		end
 	end
 
-	for filePath, _ in pairs(toUseMasterFile) do
-		print(filePath)
-	end
-
-	
+	print("All jobs done.")	
 
 end)
 

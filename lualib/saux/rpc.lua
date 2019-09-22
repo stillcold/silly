@@ -136,9 +136,7 @@ function server.call(self, fd, cmd, body)
 
 	local rpcproto = self.config.proto
 
-	print("server.call, 000", cmd)
 	local cmd = rpcproto:tag(cmd)
-	print("server.call, 000", cmd)
 	
 	local session = core.genid()
 	local hdrdat = pack("<I4I4", session, cmd)
@@ -223,9 +221,7 @@ local function doconnect(self)
 			if #str < 8 then
 				core.log("[rpc.client] decode the header fail")
 			end
-			print("client data 000", str)
 			local session, cmd = unpack("<I4I4", str)
-			print("client data 111", session, cmd)
 			local body = rpcproto:decode(cmd, str, 8)
 			if not body then
 				core.log("[rpc.client] parse body fail", session, cmd)
