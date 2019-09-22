@@ -38,6 +38,24 @@ ReplySearchRepoOverview 0x2007 {
 	.overview:string 1
 }
 
+GetMasterFileContent 0x2008 {
+	.fileName:string 1
+}
+
+ReplyMasterFileContent 0x2009 {
+	.fileName:string 1
+	.fileContent:string 2
+}
+
+UploadSlaveFileContent 0x200a {
+	.fileName:string 1
+	.fileContent:string 2
+}
+
+SyncUploadSlaveFileContent 0x200b {
+	.fileName:string 1
+}
+
 ]]
 
 return proto
