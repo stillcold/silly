@@ -14,12 +14,92 @@ local defaultHead = httpIndex.Head
 local defaultTail = httpIndex.Tail
 local default = defaultHead..defaultTail
 
+local content = ""
+local cachedBirthday = {}
+
 local function checkValidRequest(request)
 	local sign = request and request.form and request.form.sign
 	if not sign or sign ~= "antihack" then
 		return
 	end
 	return true
+end
+
+local function getTodayDataStr()
+	local todayTimeForShow = os.date("*t", os.time())
+	
+	local wdayForShow = todayTimeForShow.wday
+	wdayForShow = wdayForShow - 1
+	if wdayForShow == 0 then
+		wdayForShow = "日"
+	end
+	
+	local todayTimeStrForShow = "今天是 "..todayTimeForShow.year.."年"..todayTimeForShow.month.."月"..todayTimeForShow.day.."日,星期"..wdayForShow.."<br><br>"
+	return todayTimeStrForShow
+end
+
+local function getBirthdayInfo(dayRange, LowTime, HighTime)
+	
+	-- 检查生日部分
+	local nowTime = os.time()
+	local isCacheHit = false
+	if cachedBirthday.expire and cachedBirthday.expire > nowTime then
+		if cachedBirthday[dayRange] then
+			
+			isCacheHit = true
+			return cachedBirthday[dayRange]
+		end
+	else
+		cachedBirthday = {expire = (nowTime + 3600 *24)}
+	end
+
+if not isCacheHit then
+
+	local birthdayTxt = ""
+
+	local today = os.date("*t", nowTime)
+	queryResult = db:GetAllBirthdayRecord(LowTime, HighTime)
+	for k,v in pairs (queryResult or {}) do
+		local jsonStr = v.AllProps
+		local jsonTbl = json.decode(jsonStr)
+		print(k, jsonTbl.date)
+		local year, month, day = string.match(jsonTbl.date or "", "(%d+)[^%d]+(%d+)[^%d]+(%d+)")
+		local isYangLi = jsonTbl.isYangLi
+		year 	= tonumber(year)
+		month 	= tonumber(month)
+		day 	= tonumber(day)
+		
+		local birthdayDate = {year = year, month = month, day = day}
+		
+		-- 农历
+		if isYangLi == false or isYangLi == "false" then
+			local birthDayYangLiDate = dateUtil:NongLi2YangLiDate(birthdayDate)
+			local todayNongLiDate = dateUtil:YangLi2NongLiDate({year = today.year, month = today.month, day = today.day})
+			if dateUtil:IsBirthdayDateNear(nowTime, birthdayDate, true, dayRange) then
+				local text = v.Name
+				local nongliText = "(农历 "..birthdayDate.year.."-"..birthdayDate.month.."-"..birthdayDate.day..")"
+				birthdayTxt = birthdayTxt..birthDayYangLiDate.month.."月"..birthDayYangLiDate.day.."日"..nongliText.."是<em>"..text.."</em>的生日"..[[<br>]]
+			end
+			
+		-- 阳历
+		else
+			local yangLiDayOfThisYear = {year = today.year, month = birthdayDate.month, day = birthdayDate.day, hour = 12, min = 0, sec = 0}
+			local yangLiTimeOfThisYear = os.time(yangLiDayOfThisYear)
+		
+			if yangLiTimeOfThisYear >= LowTime and yangLiTimeOfThisYear <= HighTime then
+				local text = v.Name
+				local yangliText = "(阳历 "..birthdayDate.year.."-"..birthdayDate.month.."-"..birthdayDate.day..")"
+				birthdayTxt = birthdayTxt..birthdayDate.month.."月"..birthdayDate.day.."日"..yangliText.."是<em>"..text.."</em>的生日"..[[<br>]]
+			end
+		end
+		
+	end
+
+	cachedBirthday[dayRange] = birthdayTxt
+	
+end
+
+	return birthdayTxt or ""
 end
 
 dispatch["/"] = function(fd, request, body)
@@ -38,8 +118,6 @@ dispatch["/"] = function(fd, request, body)
 	write(fd, 200, head, body)
 end
 
-local content = ""
-local cachedBirthday = {}
 
 dispatch["/search"] = function(fd, request, body)
 	
@@ -95,6 +173,9 @@ dispatch["/search"] = function(fd, request, body)
 	local lineDateBeginTag = "<i>"
 	local lineDateEndTag = "</i>"
 	
+	local todayTimeStrForShow = getTodayDataStr()
+	result = result.."<br>"..todayTimeStrForShow
+	
 	for k,v in pairs (queryResult or {}) do
 		print(k,v.AllProps)
 		print(v.Id)
@@ -141,64 +222,8 @@ dispatch["/search"] = function(fd, request, body)
 	
 	result = result.."<br>"
 	
-	-- 检查生日部分
-	local nowTime = os.time()
-	local isCacheHit = false
-	if cachedBirthday.expire and cachedBirthday.expire > nowTime then
-		if cachedBirthday[dayRange] then
-			
-			isCacheHit = true
-		end
-	else
-		cachedBirthday = {expire = (nowTime + 3600 *24)}
-	end
-
-if not isCacheHit then
-
-	local birthdayTxt = ""
-
-	local today = os.date("*t", nowTime)
-	queryResult = db:GetAllBirthdayRecord(LowTime, HighTime)
-	for k,v in pairs (queryResult or {}) do
-		local jsonStr = v.AllProps
-		local jsonTbl = json.decode(jsonStr)
-		print(k, jsonTbl.date)
-		local year, month, day = string.match(jsonTbl.date or "", "(%d+)[^%d]+(%d+)[^%d]+(%d+)")
-		local isYangLi = jsonTbl.isYangLi
-		year 	= tonumber(year)
-		month 	= tonumber(month)
-		day 	= tonumber(day)
-		
-		local birthdayDate = {year = year, month = month, day = day}
-		
-		-- 农历
-		if isYangLi == false or isYangLi == "false" then
-			local birthDayYangLiDate = dateUtil:NongLi2YangLiDate(birthdayDate)
-			local todayNongLiDate = dateUtil:YangLi2NongLiDate({year = today.year, month = today.month, day = today.day})
-			if dateUtil:IsBirthdayDateNear(nowTime, birthdayDate, true, dayRange) then
-				local text = v.Name
-				local nongliText = "(农历 "..birthdayDate.year.."-"..birthdayDate.month.."-"..birthdayDate.day..")"
-				birthdayTxt = birthdayTxt..birthDayYangLiDate.month.."月"..birthDayYangLiDate.day.."日"..nongliText.."是<em>"..text.."</em>的生日"..[[<br>]]
-			end
-			
-		-- 阳历
-		else
-			local yangLiDayOfThisYear = {year = today.year, month = birthdayDate.month, day = birthdayDate.day, hour = 12, min = 0, sec = 0}
-			local yangLiTimeOfThisYear = os.time(yangLiDayOfThisYear)
-		
-			if yangLiTimeOfThisYear >= LowTime and yangLiTimeOfThisYear <= HighTime then
-				local text = v.Name
-				local yangliText = "(阳历 "..birthdayDate.year.."-"..birthdayDate.month.."-"..birthdayDate.day..")"
-				birthdayTxt = birthdayTxt..birthdayDate.month.."月"..birthdayDate.day.."日"..yangliText.."是<em>"..text.."</em>的生日"..[[<br>]]
-			end
-		end
-		
-	end
-
-	cachedBirthday[dayRange] = birthdayTxt
-	
-end
-	result = result.. cachedBirthday[dayRange]
+	-- result = result.. cachedBirthday[dayRange]
+	result = result..getBirthdayInfo(dayRange, LowTime, HighTime)
 	
 	if content == "weeklyReport" then
 		local diarySaveInfoTbl = {keyworld = text, action = "weekly", tag = "text_from_todo"}
@@ -277,6 +302,9 @@ dispatch["/delete"] = function(fd, request, body)
 	local showTbl = {}
 	local result = ""
 	
+	local todayTimeStrForShow = getTodayDataStr()
+	result = result.."<br>"..todayTimeStrForShow
+	
 	local wdayCache = {}
 	local weekCache = {}
 	local dayOfYearCache = {}
@@ -326,6 +354,9 @@ dispatch["/delete"] = function(fd, request, body)
 		result = result..[[<a href = "postpone?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">postpone</a>&nbsp;&nbsp;]]
 		result = result..[[<a href = "delete?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
+	
+	result = result..getBirthdayInfo(dayRange, LowTime, HighTime)
+	
 	-- local result = json.encode(showTbl)
 	local body = httpIndex.SearchResultHead..result..httpIndex.SearchResultTail
 
@@ -391,6 +422,9 @@ dispatch["/postpone"] = function(fd, request, body)
 	local showTbl = {}
 	local result = ""
 	
+	local todayTimeStrForShow = getTodayDataStr()
+	result = result.."<br>"..todayTimeStrForShow
+	
 	local wdayCache = {}
 	local weekCache = {}
 	local dayOfYearCache = {}
@@ -440,6 +474,9 @@ dispatch["/postpone"] = function(fd, request, body)
 		result = result..[[<a href = "postpone?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">postpone</a>&nbsp;&nbsp;]]
 		result = result..[[<a href = "delete?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
+	
+	result = result..getBirthdayInfo(dayRange, LowTime, HighTime)
+	
 	-- local result = json.encode(showTbl)
 	local body = httpIndex.SearchResultHead..result..httpIndex.SearchResultTail
 
@@ -504,6 +541,9 @@ dispatch["/advance"] = function(fd, request, body)
 	local showTbl = {}
 	local result = ""
 	
+	local todayTimeStrForShow = getTodayDataStr()
+	result = result.."<br>"..todayTimeStrForShow
+	
 	local wdayCache = {}
 	local weekCache = {}
 	local dayOfYearCache = {}
@@ -553,6 +593,9 @@ dispatch["/advance"] = function(fd, request, body)
 		result = result..[[<a href = "postpone?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">postpone</a>&nbsp;&nbsp;]]
 		result = result..[[<a href = "delete?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
+	
+	result = result..getBirthdayInfo(dayRange, LowTime, HighTime)
+	
 	-- local result = json.encode(showTbl)
 	local body = httpIndex.SearchResultHead..result..httpIndex.SearchResultTail
 
