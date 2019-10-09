@@ -355,6 +355,7 @@ dispatch["/delete"] = function(fd, request, body)
 		result = result..[[<a href = "delete?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
 	
+	result = result.."<br>"
 	result = result..getBirthdayInfo(dayRange, LowTime, HighTime)
 	
 	-- local result = json.encode(showTbl)
@@ -475,6 +476,7 @@ dispatch["/postpone"] = function(fd, request, body)
 		result = result..[[<a href = "delete?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
 	
+	result = result.."<br>"
 	result = result..getBirthdayInfo(dayRange, LowTime, HighTime)
 	
 	-- local result = json.encode(showTbl)
@@ -594,6 +596,7 @@ dispatch["/advance"] = function(fd, request, body)
 		result = result..[[<a href = "delete?sign=antihack&todoType=]]..content..[[&id=]]..v.Id..[[&remindTime=]]..v.RemindTime..[[&text=]]..text..[[">done</a>&nbsp;&nbsp;]]..text..[[<br>]]
 	end
 	
+	result = result.."<br>"
 	result = result..getBirthdayInfo(dayRange, LowTime, HighTime)
 	
 	-- local result = json.encode(showTbl)
