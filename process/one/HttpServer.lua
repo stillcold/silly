@@ -4,6 +4,8 @@ local searchMgr = require "SearchMgr"
 local write = server.write
 local htmlTags = require "HtmlTags"
 local console = require "sys.console"
+local localConfig = require "LocalConfig"
+local core = require "sys.core"
 
 local dispatch = {}
 
@@ -13,9 +15,16 @@ local default = defaultHead..defaultTail
 local signedHead = htmlTags.HeadWithSign or defaultHead
 
 local function checkRequest(request)
-	if request.form and request.form.sign == "antihack" then
-		return true
+
+	if request.Cookie ~= core.envget("Cookie") then
+		return false
 	end
+
+	if not request.form or request.form.sign ~= core.envget("Sign") then
+		return false
+	end
+	
+	return true
 end
 
 dispatch["/"] = function(fd, request, body)

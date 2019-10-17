@@ -2,6 +2,8 @@ local core = require "sys.core"
 local socket = require "sys.socket"
 local stream = require "http.stream"
 
+require "utils.tableutils"
+
 local assert = assert
 local tonumber = tonumber
 local sub = string.sub
@@ -135,6 +137,9 @@ local function httpd(fd, handler)
 			socket.close(fd)
 			return
 		end
+		
+		PrintTable(header)
+		
 		if header["Content-Type"] == "application/x-www-form-urlencoded" then
 			for k, v in gmatch(body, "(%w+)=(%w+)") do
 				header.form[k] = urldecode(v)

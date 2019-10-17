@@ -7,6 +7,7 @@ local db = require "DbMgr"
 local json = require "sys/json"
 local dateUtil = require "utils/dateutil"
 local httpClient = require "http.client"
+local core = require "sys.core"
 
 local dispatch = {}
 
@@ -19,9 +20,13 @@ local cachedBirthday = {}
 
 local function checkValidRequest(request)
 	local sign = request and request.form and request.form.sign
-	if not sign or sign ~= "antihack" then
+	if not sign or sign ~= core.envget("Sign") then
 		return
 	end
+	if request.Cookie ~= core.envget("Cookie") then
+		return
+	end
+	
 	return true
 end
 
