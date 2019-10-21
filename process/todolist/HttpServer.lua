@@ -8,6 +8,7 @@ local json = require "sys/json"
 local dateUtil = require "utils/dateutil"
 local httpClient = require "http.client"
 local core = require "sys.core"
+require "utils.tableutils"
 
 local dispatch = {}
 
@@ -78,7 +79,9 @@ if not isCacheHit then
 		
 		-- 农历
 		if isYangLi == false or isYangLi == "false" then
-			local birthDayYangLiDate = dateUtil:NongLi2YangLiDate(birthdayDate)
+		    PrintTable(birthdayDate)
+			local birthDayYangLiDate = dateUtil:NongLi2ThisYearYangLi(birthdayDate)
+			PrintTable(birthDayYangLiDate)
 			local todayNongLiDate = dateUtil:YangLi2NongLiDate({year = today.year, month = today.month, day = today.day})
 			if dateUtil:IsBirthdayDateNear(nowTime, birthdayDate, true, dayRange) then
 				local text = v.Name

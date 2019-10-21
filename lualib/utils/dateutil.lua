@@ -174,8 +174,31 @@ function DateUtil:YangLiCompareNongLi(yDate, nDate)
 
 end
 
+function DateUtil:NongLi2ThisYearYangLi(target)
+	local today = os.date("*t", os.time())
+
+	local needed = {
+		year = today.year,
+		month = target.month,
+		day = target.day,
+		isleap = 0,
+		isLeap = 0
+	}
+	return calender.lunartosolar(needed)
+end
+
 -- 农历转阳历
 function DateUtil:NongLi2YangLiDate(target)
+
+	if true then
+		local needed = {
+			year = target.year,
+			month = target.month,
+			day = target.day,
+			isleap = 0
+		}
+		return calender.lunartosolar(needed)
+	end
 	-- 找到这个月的阳历月初
 	local try = {year = target.year, month = target.month, day = 1}
 	-- 阳历一般比农历往后延1个月

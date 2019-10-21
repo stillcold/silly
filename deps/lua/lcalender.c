@@ -105,7 +105,56 @@ static void setcalenderallfields (lua_State *L, int year, int mon, int day, int 
   setcalenderfield(L, "day", day);
   setcalenderfield(L, "month", mon);
   setcalenderfield(L, "year", year);
-  setcalenderboolfield(L, "isleap", isLeap);
+  setcalenderboolfield(L, "isLeap", isLeap);
+}
+
+static int calender_lunartosolar(lua_State *L){
+  int lunarYear = getfieldfromcalender(L, "year", 0);
+  int lunarMonth = getfieldfromcalender(L, "month", 0);
+  int lunarDay = getfieldfromcalender(L, "day", 0);
+  int isLeap = getfieldfromcalender(L, "isLeap", 0);
+
+  int days = lunar_month_days[lunarYear - lunar_month_days[0]];
+  int leap = getbitint(days, 4, 13);
+  int offset = 0;
+  int loopend = leap;
+  if (isLeap != 1){
+    if(lunarMonth <= leap || leap == 0){
+      loopend = lunarMonth - 1;
+    }
+    else{
+      loopend = lunarMonth;
+    }
+  }
+
+  for (int i = 0; i < loopend; i++) {
+    offset += getbitint(days, 1, 12 - i) == 1 ? 30 : 29;
+  }
+
+  offset += lunarDay;
+
+  int solar11 = solar_1_1[lunarYear - solar_1_1[0]];
+  int y = getbitint(solar11, 12, 9);
+  int m = getbitint(solar11, 4, 5);
+  int d = getbitint(solar11, 5, 0);
+
+  int intFromSolar = solartoint(y, m, d) + offset - 1;
+
+  long yy = (10000LL * intFromSolar + 14780) / 3652425;
+  long ddd = intFromSolar - (365 * yy + yy / 4 - yy / 100 + yy / 400);
+
+  if (ddd < 0){
+    yy --;
+    ddd = intFromSolar - (365 * yy + yy / 4 - yy / 100 + yy / 400);
+  }
+
+  long mi = (100 * ddd + 52) / 3060;
+  long mm = (mi + 2) % 12 + 1;
+  yy = yy + (mi + 2) / 12;
+  long dd = ddd - (mi * 306 + 5) / 10 + 1;
+
+  setcalenderallfields(L, (int)yy, (int)mm, (int)dd, 0);
+  return 1;
 }
 
 static int calender_solartolunar(lua_State *L){
@@ -170,6 +219,7 @@ static int calender_solartolunar(lua_State *L){
 }
 
 static const luaL_Reg syslib[] = {
+  {"lunartosolar",     calender_lunartosolar},
   {"solartolunar",     calender_solartolunar},
   {NULL, NULL}
 };
