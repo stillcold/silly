@@ -50,6 +50,9 @@ LUAMOD_API int (luaopen_package) (lua_State *L);
 #define LUA_LFSLIBNAME "lfs"
 LUAMOD_API int (luaopen_lfs) (lua_State *L);
 
+#define LUA_CALENDERLIBNAME "calender"
+LUAMOD_API int (luaopen_calender) (lua_State *L);
+
 /* open all previous libraries */
 LUALIB_API void (luaL_openlibs) (lua_State *L);
 
