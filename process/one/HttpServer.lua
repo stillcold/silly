@@ -6,6 +6,7 @@ local htmlTags = require "HtmlTags"
 local console = require "sys.console"
 local localConfig = require "LocalConfig"
 local core = require "sys.core"
+local keywordDatabaseMgr = require "KeywordDatabaseMgr"
 
 local dispatch = {}
 
@@ -13,6 +14,8 @@ local defaultHead = htmlTags.Head
 local defaultTail = htmlTags.Tail
 local default = defaultHead..defaultTail
 local signedHead = htmlTags.HeadWithSign or defaultHead
+local addNewSearchItemHead = htmlTags.AddNewSearchItemHead or defaultHead
+local addNewSearchItemWithSignHead = htmlTags.AddNewSearchItemHeadWithSign or defaultHead
 
 local function checkRequest(request)
 
@@ -92,6 +95,50 @@ dispatch["/detail"] = function(fd, request, body)
 end
 
 
+dispatch["/addWnd"] = function(fd, request, body)
+	local body = addNewSearchItemHead..defaultTail
+	local head = {
+		"Content-Type: text/html",
+		}
+
+	if checkRequest(request) then
+print("valid request found")
+		body = addNewSearchItemWithSignHead..defaultTail
+	end
+
+	write(fd, 200, head, body)
+end
+
+dispatch["/add"] = function(fd, request, body)
+	local body = default
+	local head = {
+		"Content-Type: text/html",
+	}
+
+	print("handle is add")
+	if checkRequest(request) then
+		local keyword = request.form.kwd
+		local itemType = request.form.itemType
+		local parseRule = request.form.parseRule
+		local title = request.form.tit
+		local content = request.form.cnt
+
+		local item = {
+			keyword 	= keyword,
+			itemType 	= itemType,
+			parseRule 	= parseRule,
+			title 		= title,
+			content 	= content,
+		}
+		
+		local addResult = keywordDatabaseMgr:Add(item)
+		body = addNewSearchItemHead..addResult..defaultTail
+	else
+		print("invalid request")
+	end
+
+	write(fd, 200, head, body)
+end
 
 -- Entry!
 server.listen(":8089", function(fd, request, body)
