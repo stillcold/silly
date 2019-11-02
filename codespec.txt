@@ -1,0 +1,7 @@
+I put this spec here so I can write as it tells, this is the basic rule this
+repo must follow.
+
+1: Folder name shold be written in lower-case letters instead of capitals.
+2: File name also in lower-case.
+3: Class, method, and field names all use camel casing.
+

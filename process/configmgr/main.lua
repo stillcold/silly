@@ -1,0 +1,1 @@
+local globalConfig = require ""
