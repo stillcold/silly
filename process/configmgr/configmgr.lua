@@ -28,7 +28,7 @@ function configMgr:ConfigOneFile(filePath, item, value)
 	if matchIdx <= 0 then
 		return
 	end
-	print("will config "..item.." to "..value.." in ".. filePath..", line "..matchIdx)
+	print("\tWill config "..item.." to "..value.." in ".. filePath..", line "..matchIdx)
 	local outFile = io.open(filePath, "w")
 	for idx, line in ipairs(fileContent) do
 		if idx ~= matchIdx then
@@ -58,6 +58,7 @@ end
 function configMgr:GetLocalEnvValue(process, item)
 	-- 映射的本地配置名
 	local localEnv = configMapMgr:GetLocalEnv(process, item)
+	print("\tLocalEnv name of process " .. process .. " for item ".. item .. " is "..(localEnv or "nil"))
 	if not localEnv then return end
 
 	return localEnvConfig[localEnv]
@@ -76,7 +77,14 @@ function configMgr:GetToConfigItemInProcess(process)
 			"MindMapDir",
 		}
 	end
-	if process == "todo" then
+	if process == "todolist" then
+		return {
+			"Cookie",
+			"Sign",
+			"DbUser",
+			"DbPass",
+			"DbHost",
+		}
 	end
 end
 
@@ -85,6 +93,7 @@ function configMgr:ConfigProcess(process)
 	if not toConfigItem then return end
 
 	for _,item in ipairs(toConfigItem) do
+		print("To config item " .. item .. " in " .. process .. "...")
 		local value = self:GetLocalEnvValue(process, item)
 		self:ConfigOneItemInProcess(process, item, value)
 	end

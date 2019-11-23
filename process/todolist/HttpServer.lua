@@ -22,9 +22,11 @@ local cachedBirthday = {}
 local function checkValidRequest(request)
 	local sign = request and request.form and request.form.sign
 	if not sign or sign ~= core.envget("Sign") then
+		print("invalid 1")
 		return
 	end
 	if request.Cookie ~= core.envget("Cookie") then
+		print("invalid 2")
 		return
 	end
 	
@@ -235,7 +237,7 @@ dispatch["/search"] = function(fd, request, body)
 	
 	if content == "weeklyReport" then
 		local diarySaveInfoTbl = {keyworld = text, action = "weekly", tag = "text_from_todo"}
-		local code, header, weeklyResult = httpClient.POST("http://127.0.0.1:80/mail_weekly_content.php", {"Content-Type: text/plain"}, json.encode(diarySaveInfoTbl))
+		local code, header, weeklyResult = httpClient.POST("http://127.0.0.1:8086/mail_weekly_content.php", {"Content-Type: text/plain"}, json.encode(diarySaveInfoTbl))
 
 		print("check what in res", weeklyResult)
 		-- for k,v in pairs(weeklyResult) do

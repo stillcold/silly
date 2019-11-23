@@ -1,7 +1,12 @@
 
 local configMap = {
+	-- In this format:
+	-- ItemNameInEntryFile = {processName = "LocalEnvName"}
 	-- Below is a sample
 	-- Cookie = { one = "Coocie_One", todolist = "Cookie_todolist"}
+	DbUser 	= {todolist = "TodoDbUser"},
+	DbHost 	= {todolist = "TodoDbHost"},
+	DbPass	= {todolist = "TodoDbPassword"},
 }
 
 local configMapMgr = {}

@@ -1,5 +1,6 @@
 local mysql = require "sys.db.mysql"
 local json = require "sys/json"
+local core = require "sys.core"
 
 local DbMgr = {}
 
@@ -7,9 +8,9 @@ DbMgr.db = nil
 
 function DbMgr:SelectTable()
 	local db = mysql.create {
-		host="127.0.0.1:3306",
-		user="todo",
-		password="mytodo",
+		host=core.envget("DbHost"),
+		user=core.envget("DbUser"),
+		password=core.envget("DbPass"),
 	}
 	db:connect()
 	local status, res = db:query("show databases;")

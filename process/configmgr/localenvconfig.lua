@@ -15,6 +15,13 @@ local localEnvConfig = {
 	InternalIp = "127.0.0.1",
 	-- 本地部署的http端口,目前多用于服务器启动的时候拉代码
 	InternalHttpPort = 80,
+	-- TodoList使用的数据库地址和端口
+	TodoDbHost = "127.0.0.1:3306",
+	-- TodoList使用的数据库用户
+	TodoDbUser = "todo",
+	-- TodoList使用的数据库密码
+	TodoDbPassword = "123456",
+
 }
 
 return localEnvConfig
