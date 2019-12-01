@@ -247,7 +247,8 @@ local function doconnect(self)
 					local hdrdat = pack("<I4I4", session, cmd)
 					local bodydat = rpcproto:encode(cmd, res)
 					local full = rpcproto:pack(hdrdat .. bodydat)
-					core.write(fd, np.pack(full))
+					-- I think server now cannot wait for this ack
+					-- core.write(fd, np.pack(full))
 				
 				end
 				
