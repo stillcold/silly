@@ -12,7 +12,7 @@ console {
 }
 core.start(function()
 	-- core.debuglevel(1, -1)
-	core.debuglevel(1)
+	-- core.debuglevel(1)
 	core.debug(0, "check debug out")
 	core.debug(1, "debug level 1")
 	core.debug(2, "debug level 2")
