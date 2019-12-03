@@ -6,14 +6,38 @@
 #include "x.h"
 #include "x_log.h"
 
-static pid_t pid;
+static pid_t 	pid;
+static int 	 	level = 0;
+static int 		ignoreDefalutLv = 0;
 
 void
 x_log_start()
 {
 	pid = getpid();
+	level = 0;
 	return ;
 }
+
+void
+x_debug_setlevel(int lv, int ignoreDefault)
+{
+	level = lv;
+	ignoreDefalutLv = ignoreDefault;
+	return;
+}
+
+int
+x_debug_checklevel(int lv)
+{
+	return lv - level;
+}
+
+int
+x_debug_checkdefault()
+{
+	return ignoreDefalutLv;
+}
+
 
 void
 x_log_raw(const char *fmt, ...)

@@ -159,6 +159,79 @@ llog(lua_State *L)
 }
 
 static int
+lsetdbglevel(lua_State *L)
+{
+	int paramn = lua_gettop(L);
+	if (paramn == 1){
+		int logLv = (int)lua_tointeger(L, 1);
+		x_debug_setlevel(logLv, 0);
+	}
+	if (paramn == 2){
+		int logLv = (int)lua_tointeger(L, 1);
+		int checkdefault = (int)lua_tointeger(L, 2);
+		x_debug_setlevel(logLv, checkdefault);
+	}
+	return 0;
+}
+
+// Maybe this is not a good name?
+static int
+ldebug(lua_State *L)
+{
+	int paramn = lua_gettop(L);
+	int lvType = lua_type(L, 1);
+	int base = 1;
+	int logLv;
+
+	if (lvType == LUA_TNUMBER)
+	{
+		logLv = (int)lua_tointeger(L, 1);
+		if (x_debug_checklevel(logLv) < 0 )
+		{
+			return 0;
+		}
+		base = 2;
+	}else{
+		if (x_debug_checkdefault() < 0 )
+		{
+			return 0;
+		}
+		logLv = 0;
+	}
+
+	int i;
+	x_log("Debug lv %d, ",logLv);
+
+	for (i = base; i <= paramn; i++) {
+		int type = lua_type(L, i);
+		switch (type) {
+		case LUA_TSTRING:
+			x_log_raw("%s ", lua_tostring(L, i));
+			break;
+		case LUA_TNUMBER:
+			x_log_raw("%d ", (int)lua_tointeger(L, i));
+			break;
+		case LUA_TBOOLEAN:
+			x_log_raw("%s ",
+				lua_toboolean(L, i) ? "true" : "false");
+			break;
+		case LUA_TTABLE:
+			x_log_raw("table: %p ", lua_topointer(L, i));
+			break;
+		case LUA_TNIL:
+			x_log_raw("#%d.null ", i);
+			break;
+		default:
+			return luaL_error(L, "log unspport param#%d type:%s",
+				i, lua_typename(L, type));
+		}
+	}
+	x_log_raw("\n");
+	return 0;
+}
+
+
+static int
 lgenid(lua_State *L)
 {
 	uint32_t id = x_worker_genid();
@@ -564,6 +637,8 @@ luaopen_sys_x(lua_State *L)
 		{"setenv", lsetenv},
 		{"exit", lexit},
 		{"log", llog},
+		{"debug", ldebug},
+		{"setdbglevel", lsetdbglevel},
 		{"genid", lgenid},
 		{"tostring", ltostring},
 		{"getpid", lgetpid},

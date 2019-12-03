@@ -22,6 +22,8 @@ local coresume = coroutine.resume
 local core_log = x.log
 core.log = core_log
 core.exit = x.exit
+core.debug = x.debug
+core.debuglevel = x.setdbglevel
 core.tostring = x.tostring
 core.genid = x.genid
 --env
