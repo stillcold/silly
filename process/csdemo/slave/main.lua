@@ -1,6 +1,6 @@
 require "sys.tick"
 require "utils.tableutils"
-local core 			= require "sys.core"
+core 				= require "sys.core"
 local masterConn 	= require "masterConn"
 require "reciever"
 
@@ -15,7 +15,7 @@ core.start(function()
 
 	RegisterTick(function()
 		local ret = Slave2Master:Test(GetMasterConn(), 100, "send to server", {hello = "world"})
-		print("ret from server", ret)
+		core.debug(1, "ret from server", ret)
 	end, 10 * 1000)
 end)
 

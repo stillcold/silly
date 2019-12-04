@@ -1,7 +1,7 @@
 require "utils.tableutils"
 require "sys.tick"
 local console 		= require "sys.console"
-local core			= require "sys.core"
+core				= require "sys.core"
 
 local slaveConn		= require "slaveConn"
 local rpcHandleDef	= require "Slave2Master"
@@ -11,7 +11,7 @@ console {
 	addr =  ":"..core.envget("admin_port")
 }
 core.start(function()
-	-- core.debuglevel(1, -1)
+	-- core.debuglevel(10, -1)
 	-- core.debuglevel(1)
 	core.debug(0, "check debug out")
 	core.debug(1, "debug level 1")

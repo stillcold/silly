@@ -1,4 +1,7 @@
-function PrintTable(node)
+
+function PrintTable(node, debugLv)
+	debugLv = debugLv or 1
+
 	local function indent(amt)
 		local str = ""
 		for i=1,amt do
@@ -79,5 +82,9 @@ function PrintTable(node)
 	table.insert(output,outputStr)
 	outputStr = table.concat(output)
 
-	print(outputStr)
+	if core and core.debug then
+		core.debug(1, outputStr)
+	else
+		print(outputStr)
+	end
 end

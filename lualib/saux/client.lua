@@ -18,7 +18,6 @@ end
 
 function Client:Init(host, port, rpcHandleDef, rpcSenderDef)
 	local ip = dns.resolve(host, "A")
-	print("Host ip is ", ip)
 
 	local rpcHandle = rpcDef:InitRpcHandle(rpcHandleDef)
 
@@ -30,12 +29,12 @@ function Client:Init(host, port, rpcHandleDef, rpcSenderDef)
 		timeout	= 5000,
 
 		call	= function(fd, cmd, msg)
-			core.log("rpc call in", fd, cmd, msg)
+			core.debug(1, "rpc call in", fd, cmd, msg)
 			return rpcHandle["rpc"](fd, cmd, msg)
 		end,
 
 		close	= function(fd, errno)
-			core.log("connection closed ", fd, errno)
+			core.debug(1, "connection closed ", fd, errno)
 		end,
 	}
 
