@@ -11,7 +11,7 @@ console {
 	addr =  ":"..core.envget("admin_port")
 }
 core.start(function()
-	-- core.debuglevel(10, -1)
+	core.debuglevel(1, -1)
 	-- core.debuglevel(1)
 	core.debug(0, "check debug out")
 	core.debug(1, "debug level 1")

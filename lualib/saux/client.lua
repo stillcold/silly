@@ -29,7 +29,7 @@ function Client:Init(host, port, rpcHandleDef, rpcSenderDef)
 		timeout	= 5000,
 
 		call	= function(fd, cmd, msg)
-			core.debug(1, "rpc call in", fd, cmd, msg)
+			core.debug(0, "rpc call in", fd, cmd, msg)
 			return rpcHandle["rpc"](fd, cmd, msg)
 		end,
 

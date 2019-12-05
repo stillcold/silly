@@ -11,6 +11,7 @@ end
 
 
 core.start(function()
+	core.debuglevel(1, -1)
 	masterConn:Connect()
 
 	RegisterTick(function()

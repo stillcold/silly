@@ -7,7 +7,7 @@
 #include "x_log.h"
 
 static pid_t 	pid;
-static int 	 	level = 0;
+static int 	 	level = 1;
 static int 		ignoreDefalutLv = 0;
 
 void
