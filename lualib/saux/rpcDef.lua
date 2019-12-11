@@ -58,7 +58,7 @@ function RpcDef:InitRpcHandle(rpcHandleDef)
 	return dispatcher
 end
 
-function RpcDef:CheckRpcArgs(args, definedTypeList)
+function RpcDef:CheckRpcArgs(args, definedTypeList, rpcName)
 	local argc = #args - 1
 	if argc ~= #definedTypeList then
 		core.log("arg count mismatch", argc, #definedTypeList)
@@ -67,8 +67,9 @@ function RpcDef:CheckRpcArgs(args, definedTypeList)
 	for argIdx = 1,argc do
 		local simpleType = string.sub(definedTypeList, argIdx, argIdx)
 		local definedType = self:GetRealType(simpleType)
-		if definedType ~= type(args[argIdx+1]) then
-			core.log("arg type mismatch", rpcName)
+		local realType = type(args[argIdx+1])
+		if definedType ~= realType then
+			core.log("arg type mismatch rpcName is ", rpcName, ". argIdx is ",argIdx, ". definedType is ", definedType ,". real type is ", realType)
 			return
 		end
 	end
@@ -89,7 +90,7 @@ function RpcDef:AttachRpcSender(rpcSenderDef, rpcInstance, bServer)
 			handle[rpcName] = function(handle, fd, ...)
 				local args = {rpcName, ...}
 				local content = serialize(args)
-				if not RpcDef:CheckRpcArgs(args, argTypeList) then
+				if not RpcDef:CheckRpcArgs(args, argTypeList, rpcName) then
 					return
 				end
 				local ack = rpcInstance:call(fd, "rpc", {content = content})
@@ -101,7 +102,7 @@ function RpcDef:AttachRpcSender(rpcSenderDef, rpcInstance, bServer)
 			handle[rpcName] = function(handle, fd, ...)
 				local args = {rpcName, ...}
 				local content = serialize(args)
-				if not RpcDef:CheckRpcArgs(args, argTypeList) then
+				if not RpcDef:CheckRpcArgs(args, argTypeList, rpcName) then
 					return
 				end
 				local ack = rpcInstance:call("rpc", {content = content})
