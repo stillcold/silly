@@ -17,17 +17,19 @@ local foodTbl = {
 	{80, "亚萃", 3000,{"南洋菜","不辣","优惠停车","米饭","不拉肚子" },  "天街" },
 	{70, "江边城外", 3000,{"烤鱼","不辣","优惠停车" },  "天街" },
 	{70, "醉李白", 3000,{"川菜","优惠停车","好吃" },  "天街" },
-	{70, "邓文琪小龙虾盖浇饭", 1,{"外卖","小龙虾","好吃" },  "未知" },
+	{70, "邓文琪小龙虾盖浇饭", 10000,{"外卖","小龙虾","好吃" },  "未知" },
 	{70, "戒不了小龙虾", 500,{"烧烤","烤鱼","打折" },  "中南" },
-	{80, "黄焖鸡米饭", 1,{"外卖","烤鱼","实惠" },  "未知" },
+	{80, "黄焖鸡米饭", 1000,{"外卖","烤鱼","实惠" },  "未知" },
 }
 
 function WhereIsFood:GetTagMatchFactor(toSearchTbl, tags)
 	local matchCount = 0
 	for _, tag in pairs(tags) do
 		for __, kw in pairs(toSearchTbl) do
-			if string.find(tag, kw) then
-				matchCount = matchCount + 1
+			if kw ~= "吃" then
+				if string.find(tag, kw) then
+					matchCount = matchCount + 1
+				end
 			end
 		end
 	end
@@ -74,6 +76,7 @@ function WhereIsFood:GetFood(toSearchTbl)
 		if isRandom then
 			adjustWeight = math.random(1, 100)
 		end
+		print(data[2], adjustWeight, matchFactor)
 		local toShowTxt 	= "<em>"..name.."</em>,&nbsp&nbsp距离"..distance.."米,&nbsp位于"..location.."&nbsp标签:<b>"..table.concat(tags, ",").."</b>&nbsp".."总权重:<b>"..adjustWeight.."</b>,基础权重"..baseWeight.."匹配权重"..matchWeight.."距离权重"..distanceWeight
 		table.insert(adjustWeightTbl, {adjustWeight, toShowTxt})
 	end
