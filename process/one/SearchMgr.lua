@@ -3,6 +3,7 @@ local markdown = require "http.markdown"
 local searchMgr = {}
 local json = require"sys.json"
 local CodeMgr = require "CodeMgr"
+local SpecialSearchMgr = require "SpecialSearchMgr"
 
 local keywordTbl = require "KeywordTbl"
 
@@ -131,12 +132,22 @@ function searchMgr:ConvetToRichTitle(key ,title, toSearchTbl)
 	return ret
 end
 
+-- 这是入口
 function searchMgr:GetAnswer(content)
 	print("search text is: "..content.." lenth is "..#content)
 	local tosearchTbl = self:GetSearchTblByInput(content)
 	local ret = {}
-	local candidate = {}
 	local matchCount = 0
+
+	-- 检查是否能匹配特殊规则
+	local bMatched, specialResult = SpecialSearchMgr:GetSpecialResult(tosearchTbl)
+
+	if bMatched and specialResult then
+		table.insert(ret, specialResult)
+		matchCount = matchCount + 1
+	end
+
+	local candidate = {}
 	for keyword,item in pairs(keywordTbl) do
 		local bMatch, matchFactor = self:IsAllKeywordMatch(tosearchTbl, keyword)
 		if bMatch then
