@@ -281,7 +281,7 @@ dispatch["/delete"] = function(fd, request, body)
 	db:DeleteRecordById(editTarget)
 	local diarySaveInfoTbl = {keyworld = text, action = "add", tag = "text_from_todo"}
 	
-	httpClient.POST("http://127.0.0.1:80/diary/writedown.php", {"Content-Type: text/plain"}, json.encode(diarySaveInfoTbl))
+	httpClient.POST("http://127.0.0.1:8086/diary/writedown.php", {"Content-Type: text/plain"}, json.encode(diarySaveInfoTbl))
 	
 	-- local body = httpIndex.SearchResultHead..searchMgr:GetAnswer(content)..httpIndex.SearchResultTail
 	local HighTime = os.time() + 24 * 3600
