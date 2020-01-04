@@ -15,6 +15,10 @@ function SpecialSearchMgr:GetSpecialResult(toSearchTbl)
 		end
 	end
 
+	if not specialResult then
+		return false
+	end
+
 	return bMatched, specialResult.."<br>"
 end
 
