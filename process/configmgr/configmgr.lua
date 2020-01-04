@@ -15,6 +15,12 @@ function configMgr:ConfigOneFile(filePath, item, value)
 	if not inFile then
 		return
 	end
+
+	local lineEnd = ""
+	if string.find(filePath, "%.lua") then
+		lineEnd = ","
+	end
+
 	for line in inFile:lines() do
 		idx = idx + 1
 		table.insert(fileContent, line)
@@ -35,9 +41,9 @@ function configMgr:ConfigOneFile(filePath, item, value)
 			outFile:write(line.."\n")
 		else
 			if type(value) == "number" then
-				outFile:write(line:gsub("=(.+)", [[= ]]..value).."\n")
+				outFile:write(line:gsub("=(.+)", [[= ]]..value)..lineEnd.."\n")
 			else
-				outFile:write(line:gsub("=(.+)", [[= "]]..value..[["]]).."\n")
+				outFile:write(line:gsub("=(.+)", [[= "]]..value..[["]])..lineEnd.."\n")
 			end
 		end
 	end
