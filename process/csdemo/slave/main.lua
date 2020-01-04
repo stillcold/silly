@@ -15,8 +15,7 @@ core.start(function()
 	masterConn:Connect()
 
 	RegisterTick(function()
-		local ret = Slave2Master:Test(GetMasterConn(), 100, "send to server", {hello = "world"})
-		core.debug(1, "ret from server", ret)
+		Slave2Master:Test(GetMasterConn(), 100, "send to server", {hello = "world"})
 	end, 10 * 1000)
 end)
 

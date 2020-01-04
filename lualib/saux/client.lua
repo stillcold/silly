@@ -1,5 +1,5 @@
 local core		= require "sys.core"
-local rpc		= require "saux.rpc"
+local rpc		= require "saux.rpcraw"
 local rpcproto	= require "saux.xproto"
 local dns		= require "sys.dns"
 local serialize	= require "sys.serialize"
