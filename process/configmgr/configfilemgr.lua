@@ -1,3 +1,5 @@
+-- This code is not in use anymore.
+
 local configFileMgr = {}
 
 local process2ConfigFileInfo = {

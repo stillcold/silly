@@ -43,6 +43,25 @@ return {
 			},
 		},
 	},
+	todolist = 
+	{
+		{
+			path	= "process/todolist/entry.config",
+			lineEnd	= "",
+			fileType= "config",
+			items	= {
+				{"daemon", nil, 0},
+				{"bootstrap", nil, "process/todolist/main.lua"},
+				{"lualib_path", nil, "test/?.lua;lualib/?.lua;process/todolist/?.lua;"},
+				{"lualib_cpath", nil, "luaclib/?.so"},
+				{"Cookie", "Cookie", "ticket=koujue"},
+				{"Sign", "Sign", "sign"},
+				{"DbUser","TodoDbUser", "todo"},
+				{"DbPass", "TodoDbPassword", "123456"},
+				{"DbHost", "TodoDbHost", "127.0.0.1:3306"},
+			},
+		},
+	},
 	--[[
 	filesync = {
 		masterEntry = "process/filesync/master/entry.config",
