@@ -62,16 +62,24 @@ return {
 			},
 		},
 	},
-	--[[
-	filesync = {
-		masterEntry = "process/filesync/master/entry.config",
-		masterLocal = "process/filesync/master/LocalConfig.lua",
-		slaveEntry = "process/filesync/slave/entry.config",
-		slaveLocal = "process/filesync/slave/LocalConfig.lua",
+	basestaion = 
+	{
+		{
+			path	= "process/basestation/master/entry.config",
+			lineEnd	= "",
+			fileType= "config",
+			items	= {
+				{"daemon", nil, 0},
+				{"bootstrap", nil, "process/basestation/master/main.lua"},
+				{"lualib_path", nil, "test/?.lua;lualib/?.lua;process/basestation/master/?.lua;process/basestation/common/?.lua;"},
+				{"lualib_cpath", nil, "luaclib/?.so"},
+				{"master_listen_ip", "BaseStationMasterListenIp", "0.0.0.0"},
+				{"master_listen_port", "BaseStaionMasterListenPort", 10001},
+				{"admin_port", "BaseStaionAdminPort", 10002},
+				{"log_level", "BaseStaionLogLevel", 2},
+				{"log_default", "BaseStationLogDefault", -1},
+			},
+		},
 	},
-	todolist = {
-		entry = "process/todolist/entry.config",
-	},
-	--]]
 }
 
