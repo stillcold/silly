@@ -11,14 +11,19 @@ end
 
 
 core.start(function()
-	core.debuglevel(1, -1)
-	masterConn:Connect()
+	if not masterConn:Connect() then
+		core.debug(1, "connect server fail, app will quit")
+		core.exit()
+		return
+	end
 
+	core.debuglevel(1, -1)
 	local count = 0
 
 	RegisterTick(function()
 		count = count + 1
 		if count >= 2 then
+			core.debug(1, "test close connection automaticly.")
 			masterConn:Close()
 			core.exit()
 			return

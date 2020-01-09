@@ -8,7 +8,8 @@ local host = core.envget "service_host"
 local port = core.envget "service_port"
 
 local onClose = function(fd, addr, errno)
-	core.debug(1, "on mater closed", fd, addr, errno)
+	core.debug(1, "on mater closed app will quit", fd, addr, errno)
+	core.exit()
 end
 
 client:Init(host, port, rpcHandleDef, rpcSenderDef, onClose)
