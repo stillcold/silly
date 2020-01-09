@@ -13,16 +13,21 @@ local rpcClient
 
 -- global function like GetServerConn can be define somewhere.
 function Client:GetServerConn()
-	return nil
+	return rpcClient.fd
 end
 
-function Client:Init(host, port, rpcHandleDef, rpcSenderDef)
-	local ip = dns.resolve(host, "A")
+function Client:Close()
+	rpcClient:close()
+end
+
+function Client:Init(host, port, rpcHandleDef, rpcSenderDef, onClose)
+	local ip 	= dns.resolve(host, "A")
+	local addr	= ip..":"..port
 
 	local rpcHandle = rpcDef:InitRpcHandle(rpcHandleDef)
 
 	rpcClient	= rpc.createclient{
-		addr	= ip..":"..port,
+		addr	= addr,
 
 		proto	= rpcproto,
 
@@ -35,6 +40,9 @@ function Client:Init(host, port, rpcHandleDef, rpcSenderDef)
 
 		close	= function(fd, errno)
 			core.debug(1, "connection closed ", fd, errno)
+			if onClose then
+				core.pcall(onClose, fd, addr, errno)
+			end
 		end,
 	}
 
@@ -46,7 +54,7 @@ end
 
 function Client:Connect()
 	local ok = rpcClient:connect()
-	print("client connect result:", ok)
+	core.debug(1, "client connect result:", ok)
 	return ok
 end
 

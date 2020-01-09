@@ -5,7 +5,6 @@ local masterConn 	= require "masterConn"
 require "reciever"
 
 function GetMasterConn()
-	-- This result maybe nil!!
 	return masterConn:GetServerConn()
 end
 
@@ -17,8 +16,17 @@ core.start(function()
 	core.debuglevel(logLv, logDefault)
 	masterConn:Connect()
 
+	local count = 0
+
 	RegisterTick(function()
+		count = count + 1
+		if count >= 2 then
+			masterConn:Close()
+			core.exit()
+			return
+		end
+		core.debug(1, "master conn is"..(GetMasterConn() or 0 ))
 		Slave2Master:Test(GetMasterConn(), 100, "send to server", {hello = "world"})
-	end, 10 * 1000)
+	end, 3 * 1000)
 end)
 

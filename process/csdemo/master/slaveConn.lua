@@ -6,6 +6,15 @@ require "dispatch"
 local ip = core.envget "server_ip"
 local port = core.envget "server_port"
 
-server:Init(ip, port, rpcHandleDef, rpcSenderDef)
+core.debug("server bind ".. ip .. ":" .. port)
+local function OnAccept(clientId, fd, addr)
+	print("accept", clientId, fd, addr)
+end
+
+local function OnClose(clientId, fd, addr, errno)
+	print("connection closed", clientId, fd, addr, errno)
+end
+
+server:Init(ip, port, rpcHandleDef, rpcSenderDef, OnAccept, OnClose)
 
 return server

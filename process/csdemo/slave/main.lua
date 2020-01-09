@@ -14,8 +14,18 @@ core.start(function()
 	core.debuglevel(1, -1)
 	masterConn:Connect()
 
+	local count = 0
+
 	RegisterTick(function()
+		count = count + 1
+		if count >= 2 then
+			masterConn:Close()
+			core.exit()
+			return
+		end
+
+		core.debug(1, "master conn is", GetMasterConn())
 		Slave2Master:Test(GetMasterConn(), 100, "send to server", {hello = "world"})
-	end, 10 * 1000)
+	end, 3 * 1000)
 end)
 

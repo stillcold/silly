@@ -7,6 +7,10 @@ local rpcSenderDef	= require "Slave2Master"
 local host = core.envget "service_host"
 local port = core.envget "service_port"
 
-client:Init(host, port, rpcHandleDef, rpcSenderDef)
+local onClose = function(fd, addr, errno)
+	core.debug(1, "on mater closed", fd, addr, errno)
+end
+
+client:Init(host, port, rpcHandleDef, rpcSenderDef, onClose)
 
 return client

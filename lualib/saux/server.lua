@@ -45,7 +45,7 @@ function Server:CleanClientInfo(id)
 	self.m_ClientId2Addr[id] = nil
 end
 
-function Server:Init(ip, port, rpcHandleDef, rpcSenderDef)
+function Server:Init(ip, port, rpcHandleDef, rpcSenderDef, onAccept, onClose)
 
 	local rpcHandle = rpcDef:InitRpcHandle(rpcHandleDef)
 
@@ -60,6 +60,10 @@ function Server:Init(ip, port, rpcHandleDef, rpcSenderDef)
 
 			self.m_ClientId2Conn[clientId] = fd
 			self.m_ClientId2Addr[clientId] = addr
+			
+			if onAccept then
+				core.pcall(onAccept, clientId, fd, addr)
+			end
 		end,
 
 		close   = function(fd, errno)
@@ -68,9 +72,17 @@ function Server:Init(ip, port, rpcHandleDef, rpcSenderDef)
 			local clientId = self:GetClientIdByConn(fd)
 			if clientId then
 				local addr = self:GetClientAddrById(clientId)
+
+				if onClose then
+					core.pcall(onClose, clientId, fd, addr, errno)
+				end
+
 				core.log("clean client info on close id="..clientId..
 					", fd=".. fd..", addr=".. addr..", error="..errno)
 				self:CleanClientInfo(clientId)
+			else
+				core.log("connection closed without clientId, fd="..fd..
+					", errno="..errno)
 			end
 		end,
 
