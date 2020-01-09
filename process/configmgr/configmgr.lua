@@ -92,6 +92,9 @@ QueryConfig.php:
 ---
 <?php
 
+ini_set('display_errors', false);
+error_reporting(E_ALL);
+
 // 这就不用写注释了
 require 'XConfig.php';
 $itemName = $_GET['itemName'];
