@@ -11,7 +11,10 @@ end
 
 
 core.start(function()
-	core.debuglevel(1, -1)
+	local logLv 	= tonumber(core.envget("log_level"))
+	local logDefault= tonumber(core.envget("log_default"))
+	core.debug(1, "set debug level to ".. logLv ..", log default flag:"..logDefault)
+	core.debuglevel(logLv, logDefault)
 	masterConn:Connect()
 
 	RegisterTick(function()
