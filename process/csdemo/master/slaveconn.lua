@@ -2,7 +2,8 @@ local core			= require "sys.core"
 local server		= require "saux.server"
 local rpchandledef	= require "slave2master"
 local rpcsenderdef	= require "master2slave"
-require "dispatch"
+					  require "dispatch"
+
 local ip = core.envget "server_ip"
 local port = core.envget "server_port"
 
@@ -15,6 +16,10 @@ local function onclose(clientId, fd, addr, errno)
 	print("connection closed", clientId, fd, addr, errno)
 end
 
-server:init(ip, port, rpchandledef, rpcsenderdef, onaccept, onclose)
+local function precheck(clientid, fd, rpcname, ...)
+	return true
+end
+
+server:init(ip, port, rpchandledef, precheck, rpcsenderdef, onaccept, onclose)
 
 return server

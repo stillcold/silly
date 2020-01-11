@@ -12,7 +12,7 @@ function RpcDef:GetRealType(simpleType)
 	return TypeMap[simpleType]
 end
 
-function RpcDef:InitRpcHandle(rpcHandleDef)
+function RpcDef:InitRpcHandle(rpcHandleDef, precheckfunc)
 	local handle 		= rpcHandleDef[1]
 	local funcDef		= rpcHandleDef[2]
 
@@ -51,6 +51,12 @@ function RpcDef:InitRpcHandle(rpcHandleDef)
 			return
 		end
 		local argc = #args - 1
+		if precheckfunc then
+			local bok, msg = precheckfunc(fd, rpcName, table.unpack(args, 2, argc + 1))
+			if not bok then
+				return "rpc", {content = msg or "precheck failed"}
+			end
+		end
 		local ret = handle[rpcName](handle, fd, table.unpack(args, 2, argc + 1))
 		return "rpc", {content = ret}
 	end

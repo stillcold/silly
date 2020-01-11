@@ -45,9 +45,29 @@ function server:clean_clientinfo(id)
 	self.m_clientid2addr[id] = nil
 end
 
-function server:init(ip, port, rpcHandleDef, rpcSenderDef, onaccept, onclose)
+--------
+-- rpchandledef:
+--		define info of handlers for in-direction rpc.
+-- rpcprecheckfunc:
+--		common check for every in-direction rpc
+--		should be a function nil
+--		function signature is 
+--		bool fun(clientid, fd, rpcname, ...), ... represents for all args
+--		
+--------
+function server:init(ip, port, rpcHandleDef, rpcprecheckfunc, rpcSenderDef, onaccept, onclose)
 
-	local rpcHandle = rpcDef:InitRpcHandle(rpcHandleDef)
+	local precheckhandle
+	if rpcprecheckfunc then
+		precheckhandle = function(fd, rpcname, ...)
+			local clientid = self:get_clientid_by_fd(fd)
+			if not clientid then
+				return false, "no clientid found"
+			end
+			return rpcprecheckfunc(clientid, fd, rpcname, ...)
+		end
+	end
+	local rpcHandle = rpcDef:InitRpcHandle(rpcHandleDef, precheckhandle)
 
 	rpcserver 	= rpc.createserver{
 		addr    = ip..":"..port,
