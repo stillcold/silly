@@ -3,9 +3,7 @@ require "sys.tick"
 local console 		= require "sys.console"
 core				= require "sys.core"
 
-local slaveConn		= require "slaveConn"
-local rpcHandleDef	= require "Slave2Master"
-local rpcSenderDef	= require "Master2Slave"
+local slaveconn		= require "slaveconn"
 
 console {
 	addr =  ":"..core.envget("admin_port")
@@ -17,12 +15,12 @@ core.start(function()
 	core.debug(1, "debug level 1")
 	core.debug(2, "debug level 2")
 	core.debug("default debug")
-	slaveConn:Listen()
+	slaveconn:listen()
 
-	RegisterTick(function()
-		local conn = slaveConn:GetClientConnById(1)
+	registertick(function()
+		local conn = slaveconn:get_clientfd_by_id(1)
 		if conn then
-			Master2Slave:Test(conn, {testSendMaster2Slave = "hahaha"})
+			master2slave:test(conn, {testmaster2slave = "hahaha"})
 		end
 	end, 5 * 1000)
 end)

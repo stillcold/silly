@@ -1,7 +1,7 @@
 local core = require "sys.core"
 local unpack = table.unpack
 
-function RegisterTick(func, inteval, ...)
+function registertick(func, inteval, ...)
 
 	local argc = select("#", ...)
 	local nextFun
@@ -24,7 +24,7 @@ function RegisterTick(func, inteval, ...)
 	core.timeout(inteval, nextFun)
 end
 
-function RegisterTickWithCount(func, inteval, tickCount, ...)
+function registertickwithcount(func, inteval, tickCount, ...)
 
 	tickCount = tickCount or -1
 
@@ -46,8 +46,7 @@ function RegisterTickWithCount(func, inteval, tickCount, ...)
 				tickCount = tickCount - 1
 			end
 
-			print("tick count left is ", tickCount)
-
+			core.debug(0, "tick count left is ", tickCount)
 			
 			func(unpack(args, 1, argc))
 			core.timeout(inteval, nextFun)

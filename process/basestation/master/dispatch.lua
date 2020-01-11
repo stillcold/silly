@@ -1,4 +1,4 @@
-function Slave2Master:Test(conn, num, str, tbl)
+function slave2master:Test(conn, num, str, tbl)
 	core.debug(1, num, str)
 
 	PrintTable(tbl, 1)

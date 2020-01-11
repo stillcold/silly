@@ -1,23 +1,29 @@
 require "sys.tick"
 require "utils.tableutils"
 core 				= require "sys.core"
-local masterConn 	= require "masterConn"
+local crypt			= require "sys.crypt"
+local masterconn 	= require "masterconn"
+
 require "reciever"
 
-function GetMasterConn()
-	return masterConn:GetServerConn()
+function getmasterfd()
+	return masterconn:getserverfd()
 end
 
 
 core.start(function()
-	local logLv 	= tonumber(core.envget("log_level"))
-	local logDefault= tonumber(core.envget("log_default"))
-	core.debug(1, "set debug level to ".. logLv ..", log default flag:"..logDefault)
-	core.debuglevel(logLv, logDefault)
-	if not masterConn:Connect() then
+	local loglevel 	= tonumber(core.envget("log_level"))
+	local logdefault= tonumber(core.envget("log_default"))
+	core.debug(1, "set debug level to ".. loglevel ..", log default flag:"..logdefault)
+	core.debuglevel(loglevel, logdefault)
+	if not masterconn:connect() then
 		core.exit()
 		return
 	end
-	Slave2Master:Test(GetMasterConn(), 100, "send to server", {hello = "world"})
+
+	local authsalt 	= core.envget("auth_salt")
+	local authcode	= core.envget("auth_code")
+	local cryptstr 	= crypt.aesencode(authsalt, authcode)
+	slave2master:auth(getmasterfd(), cryptstr, authcode)
 end)
 

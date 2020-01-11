@@ -381,7 +381,7 @@ end
 
 searchMgr:Init()
 
-RegisterTick(function()
+registertick(function()
 	searchMgr:OnRefreshTick()
 end, 1000 * 60 * 10 )
 

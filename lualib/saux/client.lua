@@ -5,28 +5,28 @@ local dns		= require "sys.dns"
 local serialize	= require "sys.serialize"
 local rpcDef	= require "saux.rpcDef"
 
-local Client 	= {
+local client 	= {
 	m_Server = nil
 }
 
-local rpcClient
+local rpcclient
 
--- global function like GetServerConn can be define somewhere.
-function Client:GetServerConn()
-	return rpcClient.fd
+-- global function like getserverfd can be define somewhere.
+function client:getserverfd()
+	return rpcclient.fd
 end
 
-function Client:Close()
-	rpcClient:close()
+function client:close()
+	rpcclient:close()
 end
 
-function Client:Init(host, port, rpcHandleDef, rpcSenderDef, onClose)
+function client:init(host, port, rpcHandleDef, rpcSenderDef, onClose)
 	local ip 	= dns.resolve(host, "A")
 	local addr	= ip..":"..port
 
 	local rpcHandle = rpcDef:InitRpcHandle(rpcHandleDef)
 
-	rpcClient	= rpc.createclient{
+	rpcclient	= rpc.createclient{
 		addr	= addr,
 
 		proto	= rpcproto,
@@ -47,15 +47,15 @@ function Client:Init(host, port, rpcHandleDef, rpcSenderDef, onClose)
 	}
 
 	local bServer = false
-	rpcDef:AttachRpcSender(rpcSenderDef, rpcClient, bServer)
+	rpcDef:AttachRpcSender(rpcSenderDef, rpcclient, bServer)
 
-	return rpcClient
+	return rpcclient
 end
 
-function Client:Connect()
-	local ok = rpcClient:connect()
+function client:connect()
+	local ok = rpcclient:connect()
 	core.debug(1, "client connect result:", ok)
 	return ok
 end
 
-return Client
+return client

@@ -4,7 +4,15 @@ repo must follow.
 ### code style
 - Folder name shold be written in lower-case letters instead of capitals.
 - File name also in lower-case.
-- Class, method, and field names all use camel casing.
+- Class, method, and field names donnot use camel casing.
+- Sample:
+
+```
+sample.lua:
+
+function sample:do_fun()
+end
+```
 
 ### debug and log
 - use core.debug as more as possible.

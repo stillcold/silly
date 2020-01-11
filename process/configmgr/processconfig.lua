@@ -78,6 +78,8 @@ return {
 				{"admin_port", "BaseStaionAdminPort", 10002},
 				{"log_level", "BaseStaionLogLevel", 2},
 				{"log_default", "BaseStationLogDefault", -1},
+				{"auth_salt", "BaseStationAuthSalt", "salt"},
+				{"auth_code", "BaseStationAuthCode", "code"},
 			},
 		},
 		{
@@ -93,8 +95,8 @@ return {
 				{"master_listen_port", "BaseStaionMasterListenPort", 10001},
 				{"log_level", "BaseStaionLogLevel", 2},
 				{"log_default", "BaseStationLogDefault", -1},
-		
-
+				{"auth_salt", "BaseStationAuthSalt", "salt"},
+				{"auth_code", "BaseStationAuthCode", "code"},
 			},
 		},
 	},
